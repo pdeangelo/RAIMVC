@@ -1,0 +1,248 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+  <EntityContainerMapping StorageEntityContainer="RAI_TestModelStoreContainer" CdmEntityContainer="RAI_TestEntities5">
+    <EntitySetMapping Name="Clients">
+      <EntityTypeMapping TypeName="RAI_TestModel.Client">
+        <MappingFragment StoreEntitySet="Client">
+          <ScalarProperty Name="ClientID" ColumnName="ClientID" />
+          <ScalarProperty Name="ClientName" ColumnName="ClientName" />
+          <ScalarProperty Name="AdvanceRate" ColumnName="AdvanceRate" />
+          <ScalarProperty Name="MinimumInterest" ColumnName="MinimumInterest" />
+          <ScalarProperty Name="OriginationDiscount" ColumnName="OriginationDiscount" />
+          <ScalarProperty Name="OriginationDiscount2" ColumnName="OriginationDiscount2" />
+          <ScalarProperty Name="OriginationDiscountNumDays" ColumnName="OriginationDiscountNumDays" />
+          <ScalarProperty Name="OriginationDiscountNumDays2" ColumnName="OriginationDiscountNumDays2" />
+          <ScalarProperty Name="InterestBasedOnAdvance" ColumnName="InterestBasedOnAdvance" />
+          <ScalarProperty Name="OriginationBasedOnAdvance" ColumnName="OriginationBasedOnAdvance" />
+          <ScalarProperty Name="NoInterest" ColumnName="NoInterest" />
+          <ScalarProperty Name="ClientPrimeRate" ColumnName="ClientPrimeRate" />
+          <ScalarProperty Name="ClientPrimeRateSpread" ColumnName="ClientPrimeRateSpread" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="DwellingTypes">
+      <EntityTypeMapping TypeName="RAI_TestModel.DwellingType">
+        <MappingFragment StoreEntitySet="DwellingType">
+          <ScalarProperty Name="DwellingTypeID" ColumnName="DwellingTypeID" />
+          <ScalarProperty Name="OldKey" ColumnName="OldKey" />
+          <ScalarProperty Name="DwellingType1" ColumnName="DwellingType" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="Entities">
+      <EntityTypeMapping TypeName="RAI_TestModel.Entity">
+        <MappingFragment StoreEntitySet="Entity">
+          <ScalarProperty Name="EntityID" ColumnName="EntityID" />
+          <ScalarProperty Name="EntityName" ColumnName="EntityName" />
+          <ScalarProperty Name="EntityBank" ColumnName="EntityBank" />
+          <ScalarProperty Name="ABA" ColumnName="ABA" />
+          <ScalarProperty Name="Account" ColumnName="Account" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="Fees">
+      <EntityTypeMapping TypeName="RAI_TestModel.Fee">
+        <MappingFragment StoreEntitySet="Fee">
+          <ScalarProperty Name="FeeID" ColumnName="FeeID" />
+          <ScalarProperty Name="LoanID" ColumnName="LoanID" />
+          <ScalarProperty Name="MinimumInterest" ColumnName="MinimumInterest" />
+          <ScalarProperty Name="OriginationDiscount" ColumnName="OriginationDiscount" />
+          <ScalarProperty Name="OriginationDiscount2" ColumnName="OriginationDiscount2" />
+          <ScalarProperty Name="OriginationDiscountNumDays" ColumnName="OriginationDiscountNumDays" />
+          <ScalarProperty Name="OriginationDiscountNumDays2" ColumnName="OriginationDiscountNumDays2" />
+          <ScalarProperty Name="InterestBasedOnAdvance" ColumnName="InterestBasedOnAdvance" />
+          <ScalarProperty Name="OriginationBasedOnAdvance" ColumnName="OriginationBasedOnAdvance" />
+          <ScalarProperty Name="NoInterest" ColumnName="NoInterest" />
+          <ScalarProperty Name="InterestFee" ColumnName="InterestFee" />
+          <ScalarProperty Name="OriginationFee" ColumnName="OriginationFee" />
+          <ScalarProperty Name="UnderwritingFee" ColumnName="UnderwritingFee" />
+          <ScalarProperty Name="CustSvcUnderwritingDiscount" ColumnName="CustSvcUnderwritingDiscount" />
+          <ScalarProperty Name="CustSvcInterestDiscount" ColumnName="CustSvcInterestDiscount" />
+          <ScalarProperty Name="CustSvcOriginationDiscount" ColumnName="CustSvcOriginationDiscount" />
+          <ScalarProperty Name="ClientPrimeRate" ColumnName="ClientPrimeRate" />
+          <ScalarProperty Name="ClientPrimeRateSpread" ColumnName="ClientPrimeRateSpread" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="Fundings">
+      <EntityTypeMapping TypeName="RAI_TestModel.Funding">
+        <MappingFragment StoreEntitySet="Funding">
+          <ScalarProperty Name="FundingID" ColumnName="FundingID" />
+          <ScalarProperty Name="LoanID" ColumnName="LoanID" />
+          <ScalarProperty Name="DateDepositedInEscrow" ColumnName="DateDepositedInEscrow" />
+          <ScalarProperty Name="BaileeLetterDate" ColumnName="BaileeLetterDate" />
+          <ScalarProperty Name="InvestorProceedsDate" ColumnName="InvestorProceedsDate" />
+          <ScalarProperty Name="InvestorProceeds" ColumnName="InvestorProceeds" />
+          <ScalarProperty Name="ClosingDate" ColumnName="ClosingDate" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="Investors">
+      <EntityTypeMapping TypeName="RAI_TestModel.Investor">
+        <MappingFragment StoreEntitySet="Investor">
+          <ScalarProperty Name="InvestorID" ColumnName="InvestorID" />
+          <ScalarProperty Name="InvestorName" ColumnName="InvestorName" />
+          <ScalarProperty Name="CustodianName" ColumnName="CustodianName" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="Loans">
+      <EntityTypeMapping TypeName="RAI_TestModel.Loan">
+        <MappingFragment StoreEntitySet="Loans">
+          <ScalarProperty Name="LoanID" ColumnName="LoanID" />
+          <ScalarProperty Name="LoanClientID" ColumnName="LoanClientID" />
+          <ScalarProperty Name="LoanEntityID" ColumnName="LoanEntityID" />
+          <ScalarProperty Name="LoanInvestorID" ColumnName="LoanInvestorID" />
+          <ScalarProperty Name="LoanStatusID" ColumnName="LoanStatusID" />
+          <ScalarProperty Name="LoanNumber" ColumnName="LoanNumber" />
+          <ScalarProperty Name="LoanFundingDate" ColumnName="LoanFundingDate" />
+          <ScalarProperty Name="LoanMortgagee" ColumnName="LoanMortgagee" />
+          <ScalarProperty Name="LoanPropertyAddress" ColumnName="LoanPropertyAddress" />
+          <ScalarProperty Name="LoanInterestRate" ColumnName="LoanInterestRate" />
+          <ScalarProperty Name="LoanMortgageAmount" ColumnName="LoanMortgageAmount" />
+          <ScalarProperty Name="LoanAdvanceRate" ColumnName="LoanAdvanceRate" />
+          <ScalarProperty Name="LoanTypeID" ColumnName="LoanTypeID" />
+          <ScalarProperty Name="LoanEnteredDate" ColumnName="LoanEnteredDate" />
+          <ScalarProperty Name="LoanUpdateDate" ColumnName="LoanUpdateDate" />
+          <ScalarProperty Name="LoanUpdateUserID" ColumnName="LoanUpdateUserID" />
+          <ScalarProperty Name="LoanMortgageeBusiness" ColumnName="LoanMortgageeBusiness" />
+          <ScalarProperty Name="LoanDwellingType" ColumnName="LoanDwellingType" />
+          <ScalarProperty Name="StateID" ColumnName="StateID" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="LoanTypes">
+      <EntityTypeMapping TypeName="RAI_TestModel.LoanType">
+        <MappingFragment StoreEntitySet="LoanType">
+          <ScalarProperty Name="LoanTypeID" ColumnName="LoanTypeID" />
+          <ScalarProperty Name="OldKey" ColumnName="OldKey" />
+          <ScalarProperty Name="LoanType1" ColumnName="LoanType" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="Roles">
+      <EntityTypeMapping TypeName="RAI_TestModel.Role">
+        <MappingFragment StoreEntitySet="Role">
+          <ScalarProperty Name="RoleID" ColumnName="RoleID" />
+          <ScalarProperty Name="RoleName" ColumnName="RoleName" />
+          <ScalarProperty Name="InsertByUserID" ColumnName="InsertByUserID" />
+          <ScalarProperty Name="InsertDate" ColumnName="InsertDate" />
+          <ScalarProperty Name="UpdateByUserID" ColumnName="UpdateByUserID" />
+          <ScalarProperty Name="UpdateDate" ColumnName="UpdateDate" />
+          <ScalarProperty Name="Active" ColumnName="Active" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="States">
+      <EntityTypeMapping TypeName="RAI_TestModel.State">
+        <MappingFragment StoreEntitySet="State">
+          <ScalarProperty Name="StateID" ColumnName="StateID" />
+          <ScalarProperty Name="OldKey" ColumnName="OldKey" />
+          <ScalarProperty Name="State1" ColumnName="State" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="Status">
+      <EntityTypeMapping TypeName="RAI_TestModel.Status">
+        <MappingFragment StoreEntitySet="Status">
+          <ScalarProperty Name="StatusID" ColumnName="StatusID" />
+          <ScalarProperty Name="OldKey" ColumnName="OldKey" />
+          <ScalarProperty Name="Status1" ColumnName="Status" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="Users">
+      <EntityTypeMapping TypeName="RAI_TestModel.User">
+        <MappingFragment StoreEntitySet="Users">
+          <ScalarProperty Name="UserID" ColumnName="UserID" />
+          <ScalarProperty Name="UserName" ColumnName="UserName" />
+          <ScalarProperty Name="WinUserID" ColumnName="WinUserID" />
+          <ScalarProperty Name="RoleID" ColumnName="RoleID" />
+          <ScalarProperty Name="OfficeID" ColumnName="OfficeID" />
+          <ScalarProperty Name="Email" ColumnName="Email" />
+          <ScalarProperty Name="IsAdmin" ColumnName="IsAdmin" />
+          <ScalarProperty Name="Status" ColumnName="Status" />
+          <ScalarProperty Name="FinanceGroup" ColumnName="FinanceGroup" />
+          <ScalarProperty Name="AllSecurityAccess" ColumnName="AllSecurityAccess" />
+          <ScalarProperty Name="AllPipelineAccess" ColumnName="AllPipelineAccess" />
+          <ScalarProperty Name="IsAnalyst" ColumnName="IsAnalyst" />
+          <ScalarProperty Name="IsFinance" ColumnName="IsFinance" />
+          <ScalarProperty Name="IsManager" ColumnName="IsManager" />
+          <ScalarProperty Name="FundLevelAccess" ColumnName="FundLevelAccess" />
+          <ScalarProperty Name="Client" ColumnName="Client" />
+          <ScalarProperty Name="Password" ColumnName="Password" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="LoanUWs">
+      <EntityTypeMapping TypeName="RAI_TestModel.LoanUW">
+        <MappingFragment StoreEntitySet="LoanUW">
+          <ScalarProperty Name="LoanUWID" ColumnName="LoanUWID" />
+          <ScalarProperty Name="LoanID" ColumnName="LoanID" />
+          <ScalarProperty Name="LoanUW10031008LoanApplication" ColumnName="LoanUW10031008LoanApplication" />
+          <ScalarProperty Name="LoanUWAllongePromissoryNote" ColumnName="LoanUWAllongePromissoryNote" />
+          <ScalarProperty Name="LoanUWAppraisal" ColumnName="LoanUWAppraisal" />
+          <ScalarProperty Name="LoanUWAppraisalAmount" ColumnName="LoanUWAppraisalAmount" />
+          <ScalarProperty Name="LoanUWPostRepairAppraisalAmount" ColumnName="LoanUWPostRepairAppraisalAmount" />
+          <ScalarProperty Name="LoanUWAssignmentOfMortgage" ColumnName="LoanUWAssignmentOfMortgage" />
+          <ScalarProperty Name="LoanUWBackgroundCheck" ColumnName="LoanUWBackgroundCheck" />
+          <ScalarProperty Name="LoanUWCertofGoodStandingFormation" ColumnName="LoanUWCertofGoodStandingFormation" />
+          <ScalarProperty Name="LoanUWClosingProtectionLetter" ColumnName="LoanUWClosingProtectionLetter" />
+          <ScalarProperty Name="LoanUWCommitteeReview" ColumnName="LoanUWCommitteeReview" />
+          <ScalarProperty Name="LoanUWCreditReport" ColumnName="LoanUWCreditReport" />
+          <ScalarProperty Name="LoanUWFloodCertificate" ColumnName="LoanUWFloodCertificate" />
+          <ScalarProperty Name="LoanUWHUD1SettlementStatement" ColumnName="LoanUWHUD1SettlementStatement" />
+          <ScalarProperty Name="LoanUWHomeownersInsurance" ColumnName="LoanUWHomeownersInsurance" />
+          <ScalarProperty Name="LoanUWLoanPackage" ColumnName="LoanUWLoanPackage" />
+          <ScalarProperty Name="LoanUWLoanSizerLoanSubmissionTape" ColumnName="LoanUWLoanSizerLoanSubmissionTape" />
+          <ScalarProperty Name="LoanUWTitleCommitment" ColumnName="LoanUWTitleCommitment" />
+          <ScalarProperty Name="LoanUWClaytonReportApprovalEmail" ColumnName="LoanUWClaytonReportApprovalEmail" />
+          <ScalarProperty Name="LoanUWZillowSqFt" ColumnName="LoanUWZillowSqFt" />
+          <ScalarProperty Name="LoanUWIsComplete" ColumnName="LoanUWIsComplete" />
+          <ScalarProperty Name="CompletedBy" ColumnName="CompletedBy" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="vw_RAILoans">
+      <EntityTypeMapping TypeName="RAI_TestModel.vw_RAILoans">
+        <MappingFragment StoreEntitySet="vw_RAILoans">
+          <ScalarProperty Name="LoanID" ColumnName="LoanID" />
+          <ScalarProperty Name="LoanClientID" ColumnName="LoanClientID" />
+          <ScalarProperty Name="LoanEntityID" ColumnName="LoanEntityID" />
+          <ScalarProperty Name="LoanInvestorID" ColumnName="LoanInvestorID" />
+          <ScalarProperty Name="LoanStatusID" ColumnName="LoanStatusID" />
+          <ScalarProperty Name="LoanNumber" ColumnName="LoanNumber" />
+          <ScalarProperty Name="LoanFundingDate" ColumnName="LoanFundingDate" />
+          <ScalarProperty Name="LoanMortgagee" ColumnName="LoanMortgagee" />
+          <ScalarProperty Name="LoanPropertyAddress" ColumnName="LoanPropertyAddress" />
+          <ScalarProperty Name="LoanInterestRate" ColumnName="LoanInterestRate" />
+          <ScalarProperty Name="LoanMortgageAmount" ColumnName="LoanMortgageAmount" />
+          <ScalarProperty Name="LoanAdvanceRate" ColumnName="LoanAdvanceRate" />
+          <ScalarProperty Name="LoanTypeID" ColumnName="LoanTypeID" />
+          <ScalarProperty Name="LoanEnteredDate" ColumnName="LoanEnteredDate" />
+          <ScalarProperty Name="LoanUpdateDate" ColumnName="LoanUpdateDate" />
+          <ScalarProperty Name="LoanUpdateUserID" ColumnName="LoanUpdateUserID" />
+          <ScalarProperty Name="LoanMortgageeBusiness" ColumnName="LoanMortgageeBusiness" />
+          <ScalarProperty Name="LoanDwellingType" ColumnName="LoanDwellingType" />
+          <ScalarProperty Name="StateID" ColumnName="StateID" />
+          <ScalarProperty Name="ClientName" ColumnName="ClientName" />
+          <ScalarProperty Name="InvestorName" ColumnName="InvestorName" />
+          <ScalarProperty Name="CustodianName" ColumnName="CustodianName" />
+          <ScalarProperty Name="EntityName" ColumnName="EntityName" />
+          <ScalarProperty Name="LoanStatus" ColumnName="LoanStatus" />
+          <ScalarProperty Name="LoanDwellingTypeName" ColumnName="LoanDwellingTypeName" />
+          <ScalarProperty Name="State" ColumnName="State" />
+          <ScalarProperty Name="LoanAdvanceAmount" ColumnName="LoanAdvanceAmount" />
+          <ScalarProperty Name="LoanReserveAmount" ColumnName="LoanReserveAmount" />
+          <ScalarProperty Name="InterestIncome" ColumnName="InterestIncome" />
+          <ScalarProperty Name="OriginationFee" ColumnName="OriginationFee" />
+          <ScalarProperty Name="UnderwritingFee" ColumnName="UnderwritingFee" />
+          <ScalarProperty Name="DateDepositedInEscrow" ColumnName="DateDepositedInEscrow" />
+          <ScalarProperty Name="InvestorProceedsDate" ColumnName="InvestorProceedsDate" />
+          <ScalarProperty Name="LoanTypeName" ColumnName="LoanTypeName" />
+          <ScalarProperty Name="LoanMinimumInterest" ColumnName="LoanMinimumInterest" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+  </EntityContainerMapping>
+</Mapping>
