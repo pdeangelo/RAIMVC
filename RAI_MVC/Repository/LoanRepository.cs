@@ -5,16 +5,111 @@ using System.Linq;
 using System.Web;
 using System.Data.Entity;
 using System.Web.Mvc;
+using System.Diagnostics;
 
 namespace RAI_MVC.Repository
 {
     public class LoanRepository
     {
+        public IList<Loan> GetLoans()
+        {
+            using (Context context = GetContext())
+            {
+                return context.Loans
+                    .Include(l => l.State)
+                  .Include(l => l.Client)
+                  .Include(l => l.LoanStatus)
+                  .Include(l => l.Entity)
+                  .Include(l => l.Investor)
+                  .Include(l => l.DwellingType)
+                  .Include(l => l.LoanType)
+                  .ToList();
+            }
+        }
+        /// <summary>
+        /// Returns a single loan.
+        /// </summary>
+        /// <returns>A fully populated Loan entity instance.</returns>
+        public Loan GetLoan(int loanID)
+        {
+            using (Context context = GetContext())
+            {
+                return context.Loans
+                 .Include(l => l.State)
+                 .Include(l => l.Client)
+                 .Include(l => l.LoanStatus)
+                 .Include(l => l.Entity)
+                 .Include(l => l.Investor)
+                 .Include(l => l.DwellingType)
+                 .Include(l => l.LoanType)
+                   .Where(cb => cb.LoanID == loanID)
+                   .SingleOrDefault();
+            }
+        }
+        public static void AddLoan(Loan loan)
+        {
+            using (Context context = GetContext())
+            {
+                context.Loans.Add(loan);
+
+                if (loan.Client != null && loan.Client.ClientID > 0)
+                {
+                    context.Entry(loan.Client).State = EntityState.Unchanged;
+                }
+
+                if (loan.DwellingType != null && loan.DwellingType.DwellingTypeID > 0)
+                {
+                    context.Entry(loan.DwellingType).State = EntityState.Unchanged;
+                }
+
+                if (loan.Entity != null && loan.Entity.EntityID > 0)
+                {
+                    context.Entry(loan.Entity).State = EntityState.Unchanged;
+                }
+
+                if (loan.LoanStatus != null && loan.LoanStatus.LoanStatusID > 0)
+                {
+                    context.Entry(loan.LoanStatus).State = EntityState.Unchanged;
+                }
+
+                if (loan.LoanType != null && loan.LoanType.LoanTypeID > 0)
+                {
+                    context.Entry(loan.LoanType).State = EntityState.Unchanged;
+                }
+
+                if (loan.State != null && loan.State.StateID > 0)
+                {
+                    context.Entry(loan.State).State = EntityState.Unchanged;
+                }
+
+                context.SaveChanges();
+            }
+        }
+        public static void UpdateLoan(Loan loan)
+        {
+            using (Context context = GetContext())
+            {
+                context.Loans.Attach(loan);
+                //comicBookEntry.Property("IssueNumber").IsModified = false;
+
+                context.SaveChanges();
+            }
+        }
+        public static void DeleteLoan(int loanID)
+        {
+            using (Context context = GetContext())
+            {
+                var loan = new Loan() { LoanID = loanID };
+                context.Entry(loan).State = EntityState.Deleted;
+
+                context.SaveChanges();
+            }
+        }
         public SelectList GetInvestors()
         {
-            using (var context = new RAI_TestEntities5())
+            using (Context context = GetContext())
             {
-                var investors = context.Investors.ToList();
+                var investors = context.Investor.ToList();
                 List<SelectListItem> list = new List<SelectListItem>();
                 foreach (Investor investor in investors)
                 {
@@ -31,16 +126,16 @@ namespace RAI_MVC.Repository
         }
         public SelectList GetTypes()
         {
-            using (var context = new RAI_TestEntities5())
+            using (Context context = GetContext())
             {
-                var loanTypes = context.LoanTypes.ToList();
+                var loanTypes = context.LoanType.ToList();
                 List<SelectListItem> list = new List<SelectListItem>();
                 foreach (LoanType loanType in loanTypes)
                 {
                     list.Add(new SelectListItem()
                     {
                         Value = loanType.LoanTypeID.ToString(),
-                        Text = loanType.LoanType1
+                        Text = loanType.LoanTypeName
                     });
                 }
                 return new SelectList(list, "Value", "Text");
@@ -48,9 +143,9 @@ namespace RAI_MVC.Repository
         }
         public SelectList GetEntities()
         {
-            using (var context = new RAI_TestEntities5())
+            using (Context context = GetContext())
             {
-                var entities = context.Entities.ToList();
+                var entities = context.Entity.ToList();
                 List<SelectListItem> list = new List<SelectListItem>();
                 foreach (Entity entity in entities)
                 {
@@ -66,16 +161,16 @@ namespace RAI_MVC.Repository
         }
         public SelectList GetStatus()
         {
-            using (var context = new RAI_TestEntities5())
+            using (Context context = GetContext())
             {
-                var statuss = context.Status.ToList();
+                var statuss = context.LoanStatus.ToList();
                 List<SelectListItem> list = new List<SelectListItem>();
-                foreach (Status status in statuss)
+                foreach (LoanStatus status in statuss)
                 {
                     list.Add(new SelectListItem()
                     {
-                        Value = status.StatusID.ToString(),
-                        Text = status.Status1
+                        Value = status.LoanStatusID.ToString(),
+                        Text = status.LoanStatusName
                     });
                 }
                 return new SelectList(list, "Value", "Text");
@@ -84,9 +179,9 @@ namespace RAI_MVC.Repository
         }
         public SelectList GetStates()
         {
-            using (var context = new RAI_TestEntities5())
+            using (Context context = GetContext())
             {
-                var states = context.States.ToList();
+                var states = context.State.ToList();
                 List<SelectListItem> list = new List<SelectListItem>();
                 foreach (State state in states)
                 {
@@ -102,9 +197,9 @@ namespace RAI_MVC.Repository
         }
         public SelectList GetUsers()
         {
-            using (var context = new RAI_TestEntities5())
+            using (Context context = GetContext())
             {
-                var users = context.Users.ToList();
+                var users = context.User.ToList();
                 List<SelectListItem> list = new List<SelectListItem>();
                 foreach (User user in users)
                 {
@@ -121,9 +216,9 @@ namespace RAI_MVC.Repository
 
         public SelectList GetClients()
         {
-            using (var context = new RAI_TestEntities5())
+            using (Context context = GetContext())
             {
-                var clients = context.Clients.ToList();
+                var clients = context.Client.ToList();
                 List<SelectListItem> list = new List<SelectListItem>();
                 foreach (Client client in clients)
                 {
@@ -139,67 +234,16 @@ namespace RAI_MVC.Repository
 
         }
 
-
-        public List<vw_RAILoans> GetLoans()
-        {
-            RAI_TestEntities5 context = new RAI_TestEntities5();
-
-
-            return context.vw_RAILoans.Where(x => x.LoanStatus != "4 - Completed").ToList();
-        }
-
-        public Loan GetLoan(int id)
-        {
-            RAI_TestEntities5 context = new RAI_TestEntities5();
-            var loan = context.Loans.FirstOrDefault(l => l.LoanID == id);
-            
-            return loan;
-
-        }
-        public void AddLoan(Loan loan)
-        {
-            // Get the next available entry ID.
-            int nextAvailableEntryId = Data.Loans
-                .Max(e => e.LoanID) + 1;
-
-            loan.LoanID = nextAvailableEntryId;
-
-            Data.Loans.Add(loan);
-        }
         /// <summary>
-        /// Updates an entry.
+        /// Private method that returns a database context.
         /// </summary>
-        /// <param name="entry">The entry to update.</param>
-        public void UpdateLoan(Loan loan)
+        /// <returns>An instance of the Context class.</returns>
+        static Context GetContext()
         {
-            // Find the index of the entry that we need to update.
-            int loanIndex = Data.Loans.FindIndex(e => e.LoanID == loan.LoanID);
-
-            if (loanIndex == -1)
-            {
-                throw new Exception(
-                    string.Format("Unable to find an Loan with an ID of {0}", loan.LoanID));
-            }
-
-            Data.Loans[loanIndex] = loan;
+            var context = new Context();
+            context.Database.Log = (message) => Debug.WriteLine(message);
+            return context;
         }
 
-        /// <summary>
-        /// Deletes an entry.
-        /// </summary>
-        /// <param name="id">The ID of the entry to delete.</param>
-        public void DeleteLoan(int id)
-        {
-            // Find the index of the entry that we need to delete.
-            int loanIndex = Data.Loans.FindIndex(e => e.LoanID == id);
-
-            if (loanIndex == -1)
-            {
-                throw new Exception(
-                    string.Format("Unable to find an loan with an ID of {0}", id));
-            }
-
-            Data.Loans.RemoveAt(loanIndex);
-        }
     }
 }

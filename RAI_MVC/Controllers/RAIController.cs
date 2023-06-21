@@ -28,27 +28,27 @@ namespace RAI_MVC.Controllers
             
             return View(user);
         }
-        public ActionResult Delete(int? id)
-        {
-            if (id == null)
-            {
-                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
-            }
+        //public ActionResult Delete(int? id)
+        //{
+        //    if (id == null)
+        //    {
+        //        return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+        //    }
 
-            Loan loan = _loanRepository.GetLoan((int)id);
-            if (loan == null)
-            {
-                return HttpNotFound();
-            }
+        //    Loan loan = _loanRepository.GetLoans
+        //    if (loan == null)
+        //    {
+        //        return HttpNotFound();
+        //    }
 
-            return View(loan);
-        }
+        //    return View(loan);
+        //}
         [HttpPost]
         public ActionResult Delete(int id)
         {
-            _loanRepository.DeleteLoan(id);
+            //_loanRepository.DeleteLoan(id);
 
-            TempData["Message"] = "Loan Successfully Deleted";
+            //TempData["Message"] = "Loan Successfully Deleted";
             return RedirectToAction("Index");
         }
         public ActionResult Edit(int? id)
@@ -71,36 +71,38 @@ namespace RAI_MVC.Controllers
         [HttpPost]
         public ActionResult Edit(Loan loan)
         {
-            ValidateLoan(loan);
-            if (ModelState.IsValid)
-            {
-                _loanRepository.UpdateLoan(loan);
-                TempData["Message"] = "Loan Successfully Updated";
-                return RedirectToAction("Index");
-            }
+            //ValidateLoan(loan);
+            //if (ModelState.IsValid)
+            //{
+            //    _loanRepository.UpdateLoan(loan);
+
+            //    TempData["Message"] = "Loan Successfully Updated";
+            //    return RedirectToAction("Index");
+            //}
 
             SetupSelectListItems();
             return View(loan);
         }
 
-        public ActionResult Index(string SelectOption, string SearchText, string StatusSelectListItems, string EntitiesSelectListItems)
+        public ActionResult Index(string SearchText, string StatusSelectListItems, string EntitiesSelectListItems, string ClientsSelectListItems, string chkShowCompleted, string submitButton)
         {
-            List<vw_RAILoans> loans = _loanRepository.GetLoans();
+            //List<vw_RAILoans> raiLoans = _loanRepository.GetLoans(StatusSelectListItems, EntitiesSelectListItems, ClientsSelectListItems, chkShowCompleted, SearchText);
+            var raiLoans = _loanRepository.GetLoans();
 
             SetupSelectListItems();
-            return View(loans);
+            return View(raiLoans);
         }
+        [HttpPost]
+        public ActionResult SubmitSelected(List<Loan> x, FormCollection collection)
+        {
 
+            return RedirectToAction("Index");
+        }
         public ActionResult Add()
         {
-            var loan = new Loan()
-            {
-                //Id = -1,
-                //LoanNumber = String.Empty,
-                //LoanMortgageAmount = 0,
-                //FundingDate = DateTime.Today,
-            };
-            SetupClientsSelectListItems();
+            var loan = new Loan();
+
+            SetupSelectListItems();
             return View(loan);
         }
         [HttpPost]
@@ -109,11 +111,11 @@ namespace RAI_MVC.Controllers
             ValidateLoan(loan);
             if (ModelState.IsValid)
             {
-                _loanRepository.AddLoan(loan);
-                TempData["Message"] = "Loan Successfully Added";
+                //_loanRepository.AddLoan(loan);
+                //TempData["Message"] = "Loan Successfully Added";
                 return Redirect("Index");
             }
-            SetupClientsSelectListItems();
+            SetupSelectListItems();
             return View(loan);
         }
         public void ValidateLoan(Loan loan)

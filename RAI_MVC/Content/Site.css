@@ -1853,6 +1853,11 @@ pre {
     }
 }
 
+@media (min-width: 1900px) {
+    .container {
+        width: 1870px
+    }
+}
 .container-fluid {
     margin-right: auto;
     margin-left: auto;

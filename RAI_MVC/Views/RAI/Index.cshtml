@@ -1,4 +1,4 @@
-﻿@model List<RAI_MVC.vw_RAILoans>
+﻿@model List<RAI_MVC.Models.Loan>
 @using RAI_MVC
 @{
     ViewBag.Title = "Loans";
@@ -11,81 +11,92 @@
         </button>
         @TempData["Message"]
     </div>
-}   <div>
-    @using (Html.BeginForm())
-    {
-       
-        <div class="form-group col-lg-2">
-            @Html.Label("Status", new { @class = "control-label" })
-            @Html.DropDownList("StatusSelectListItems", (SelectList)ViewBag.StatusSelectListItems, "-- Select --", new { id = "StatusSelectListItems", @class = "form-control" })
+}
+@using (Html.BeginForm("SubmitSelected", "RAI", FormMethod.Post))
+{
+
+        <div class="row">
+            <div class="form-group col-lg-2">
+                @Html.Label("Status", new { @class = "control-label" })
+                @Html.DropDownList("StatusSelectListItems", (SelectList)ViewBag.StatusSelectListItems, "-- Select --", new { id = "ddlStatus", @class = "form-control" })
+            </div>
+            <div class="form-group col-lg-2">
+                @Html.Label("Entities", new { @class = "control-label" })
+                @Html.DropDownList("EntitiesSelectListItems", (SelectList)ViewBag.EntitiesSelectListItems, "-- Select --", new { id = "ddlEntities", @class = "form-control" })
+
+            </div>
+            <div class="form-group col-lg-2">
+                @Html.Label("Clients", new { @class = "control-label" })
+                @Html.DropDownList("ClientsSelectListItems", (SelectList)ViewBag.ClientsSelectListItems, "-- Select --", new { id = "ddlClients", @class = "form-control" })
+            </div>
+            <div class="form-group col-lg-2">
+
+                <label>
+                    Show Completed?
+                    @Html.CheckBox("chkShowCompleted", new { id = "ckShowCompleted", @class = "form-control" })
+                </label>
+            </div>
+            <div class="form-group col-lg-1">
+                @Html.Label("Search Text", new { @class = "control-label" })
+                @Html.TextBox("SearchText", null, new { @class = "form-control" })
+
+            </div>
+            <div class="form-group col-lg-1 col-lg-offset-1">
+                @Html.Label("")
+                <input class="btn btn-lg btn-success" name="submitButton" type="submit" value="Search" />
+            </div>
         </div>
-        <div class="form-group col-lg-2">
-            @Html.Label("Entities", new { @class = "control-label" })
-            @Html.DropDownList("EntitiesSelectListItems", (SelectList)ViewBag.EntitiesSelectListItems, "-- Select --", new { id = "EntitiesSelectListItems", @class = "form-control" })
-        </div>
-        <div class="form-group col-lg-2">
-            @Html.Label("Clients", new { @class = "control-label" })
-            @Html.DropDownList("ClientsSelectListItems", (SelectList)ViewBag.ClientsSelectListItems, "-- Select --", new { id = "ClientsSelectListItems", @class = "form-control" })
-        </div>
-        <div class="form-group col-lg-2">
-            @Html.Label("Show Completed?", new { @class = "control-label" })
-            @Html.CheckBox("chkShowCompleted")
+        <div class="row">
+            <div class="form-group col-lg-1 col-lg-offset-1">
+                @Html.Label("")
+                <input class="btn btn-sm btn-success" name="submitButton" type="submit" value="Bailee" />
+            </div>
         </div>
 
-        <div class="form-group col-lg-2">
-            @Html.Label("Search Text")
-            @Html.TextBox("SearchText")
-        </div>
-        <div class="form-group col-lg-1">
-            @Html.Label("")
-            <input class="btn btn-lg " type="submit" value="Search" />
-        </div>
-    }
-</div>
 
         <div class="col-lg-12">
             <table class="table table-striped">
                 <tr class="d-flex">
-                    <th>Select</th>
-                    <th>Loan ID</th>
+                    <th> </th>
+                    @*<th>Loan ID</th>*@
                     <th>Funding Date</th>
                     <th>Escrow Date</th>
                     <th>Investor Proceeds Date</th>
-                    <th>Loan Number</th>
+                    <th class="col-lg-1">Loan Number</th>
                     <th class="col-lg-1">Status</th>
                     <th class="col-lg-1">Client</th>
                     <th class="col-lg-2">Mortgagee</th>
-                    <th>Entity</th>
-                    <th>Property Address</th>
+                    <th class="col-lg-2">Entity</th>
+                    <th class="col-lg-4">Property Address</th>
                     <th>Mortgage Amount</th>
                     <th>Interest Rate</th>
                     <th>Investor Name</th>
-                    <th class="col-lg-2">&nbsp;</th>
+                    <th class="col-lg-3">&nbsp;</th>
                 </tr>
                 @foreach (var entry in Model)
                 {
                     <tr>
-
-                        <td>@entry.LoanID</td>
+                        <td>@Html.CheckBox("chkSelected", new { id = "chkSelected", @class = "form-check-input" })</td>
+                        @*<td>@entry.LoanID</td>*@
                         <td>@String.Format("{0:MM/dd/yyyy}", entry.LoanFundingDate)</td>
                         <td>@String.Format("{0:MM/dd/yyyy}", entry.DateDepositedInEscrow)</td>
                         <td>@String.Format("{0:MM/dd/yyyy}", entry.InvestorProceedsDate)</td>
                         <td>@entry.LoanNumber</td>
-                        <td>@entry.LoanStatus</td>
-                        <td>@entry.ClientName</td>
+                        <td>@entry.LoanStatus.LoanStatusName</td>
+                        <td>@entry.Client.ClientName</td>
                         <td>@entry.LoanMortgagee</td>
-                        <td>@entry.EntityName</td>
+                        <td>@entry.Entity.EntityName</td>
                         <td>@entry.LoanPropertyAddress</td>
                         <td>@String.Format("{0:N}", entry.LoanMortgageAmount)</td>
                         <td>@String.Format("{0:P}", entry.LoanInterestRate)</td>
-                        <td>@entry.InvestorName</td>
+                        <td>@entry.Investor.InvestorName</td>
                         <td>
                             <div class="pull-right">
                                 <a href="@Url.Action("Edit", new { id = entry.LoanID })" class="btn btn-warning btn-sm margin-right">
-                                    <span class="glyphicon glyphicon-edit"></span><span class="hidden-xs"> Edit</span>
+                                    <span class="glyphicon glyphicon-edit"></span><span class="hidden-xs"> </span>
                                 </a>
                                 <a href="@Url.Action("Delete", new { id = entry.LoanID })" class="btn btn-danger btn-sm">
-                                    <span class="glyphicon glyphicon-trash"></span><span class="hidden-xs"> Delete</span>
+                                    <span class="glyphicon glyphicon-trash"></span><span class="hidden-xs"> </span>
                                 </a>
                             </div>
                         </td>
@@ -93,10 +104,6 @@
                 }
             </table>
         </div>
-        <script type="text/javascript">
 
-            function SelectedIndexChanged() {
-                //Form post
-                document.demoForm.submit();
-            }
-        </script>
+}
+

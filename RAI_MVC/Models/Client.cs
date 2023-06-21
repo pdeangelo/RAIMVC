@@ -1,18 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Web;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace RAI_MVC.Models
 {
     public class Client
     {
+        public Client()
+        {
+            Loans = new List<Loan>();
+        }
         public int ClientID { get; set; }
         public string ClientName { get; set; }
-        public Client (int clientID, string clientName)
-        {
-            ClientID = clientID;
-            ClientName = clientName;
-        }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<Loan> Loans { get; set; }
     }
 }

@@ -1,22 +1,23 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
-using System.Web;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace RAI_MVC.Models
 {
     public class Investor
     {
         public int InvestorID { get; set; }
+
+        [StringLength(200)]
         public string InvestorName { get; set; }
+
+        [StringLength(200)]
         public string CustodianName { get; set; }
-        public Investor()
-        {
-        }
-        public Investor(int investorID, string investorName)
-        {
-        InvestorID = investorID;
-        InvestorName = investorName;
-        }
+
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<Loan> Loans { get; set; }
     }
 }

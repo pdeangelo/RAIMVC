@@ -10,18 +10,20 @@ namespace RAI_MVC
 {
     public class Context : DbContext
     {
-        public Context()
+        public Context() : base("RAI")
         {
-            this.Database.Connection.ConnectionString = "data source = 52.7.206.108; initial catalog = RAI_Test; user id = CashFlowMgr; password = p@$$p0rt; multipleactiveresultsets = True; application name = EntityFramework";
+            Database.SetInitializer(new DatabaseInitializer());
         }
         public DbSet<Loan> Loans { get; set; }
-        public DbSet<Investor> Investors { get; set; }
-        protected override void OnModelCreating(DbModelBuilder modelBuilder)
-        {
-            modelBuilder.Conventions.Remove<PluralizingTableNameConvention>();
-
-           
-        }
+        public DbSet<LoanStatus> LoanStatus { get; set; }
+        public DbSet<Client> Client { get; set; }
+        public DbSet<DwellingType> DwellingType { get; set; }
+        public DbSet<Entity> Entity { get; set; }
+        public DbSet<State> State { get; set; }
+        public DbSet<Investor> Investor { get; set; }
+        public DbSet<LoanType> LoanType { get; set; }
+        public DbSet<Role> Role { get; set; }
+        public DbSet<User> User { get; set; }
     }
 }
 
