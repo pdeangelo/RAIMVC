@@ -71,3 +71,5 @@ C:\Users\pdean\Documents\SourceCode\RAI_MVC\RAIMVC\RAI_MVC\bin\Microsoft.CodeDom
 C:\Users\pdean\Documents\SourceCode\RAI_MVC\RAIMVC\RAI_MVC\obj\Debug\RAIMVC.csproj.CopyComplete
 C:\Users\pdean\Documents\SourceCode\RAI_MVC\RAIMVC\RAI_MVC\obj\Debug\RAI_MVC.dll
 C:\Users\pdean\Documents\SourceCode\RAI_MVC\RAIMVC\RAI_MVC\obj\Debug\RAI_MVC.pdb
+C:\Users\pdean\Documents\SourceCode\RAI_MVC\RAIMVC\RAI_MVC\bin\Spire.Doc.dll
+C:\Users\pdean\Documents\SourceCode\RAI_MVC\RAIMVC\RAI_MVC\bin\Spire.Doc.xml

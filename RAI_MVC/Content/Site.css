@@ -4300,7 +4300,7 @@ textarea.input-group-sm > .form-control, textarea.input-group-sm > .input-group-
         .nav > li > a {
             position: relative;
             display: block;
-            padding: 10px 15px
+            padding: 10px 10px 10px 10px
         }
 
             .nav > li > a:hover, .nav > li > a:focus {
@@ -4626,9 +4626,15 @@ textarea.input-group-sm > .form-control, textarea.input-group-sm > .input-group-
     padding: 9.5px 15px;
     font-size: 19px;
     line-height: 21px;
-    height: 40px
+    height: 60px
 }
 
+    .navbar-brand img {
+        height: 50px;
+        /* put value of image height as your need */
+        float: left;
+        margin-right: 7px;
+    }
     .navbar-brand:hover, .navbar-brand:focus {
         text-decoration: none
     }
@@ -4723,8 +4729,8 @@ textarea.input-group-sm > .form-control, textarea.input-group-sm > .input-group-
         }
 
             .navbar-nav > li > a {
-                padding-top: 9.5px;
-                padding-bottom: 9.5px
+                padding-top: 15px;
+                padding-bottom: 15px
             }
 }
 
@@ -7982,7 +7988,7 @@ a.list-group-item-danger.active {
 .navbar {
     box-shadow: none;
     border: none;
-    font-size: 12px
+    font-size: 18px
 }
 
 .navbar-default .badge {

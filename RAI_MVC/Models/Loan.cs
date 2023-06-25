@@ -10,6 +10,11 @@ namespace RAI_MVC.Models
 {
     public class Loan
     {
+        public Loan()
+        {
+
+        }
+
         public int LoanID { get; set; }
         public int? LoanStatusID { get; set; }
         public int? ClientID { get; set; }
@@ -28,7 +33,6 @@ namespace RAI_MVC.Models
         public string LoanMortgagee { get; set; }
 
         public string LoanPropertyAddress { get; set; }
-
         public double? LoanInterestRate { get; set; }
 
         public double? LoanMortgageAmount { get; set; }

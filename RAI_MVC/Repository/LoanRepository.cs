@@ -16,7 +16,7 @@ namespace RAI_MVC.Repository
             using (Context context = GetContext())
             {
                 return context.Loans
-                    .Include(l => l.State)
+                  .Include(l => l.State)
                   .Include(l => l.Client)
                   .Include(l => l.LoanStatus)
                   .Include(l => l.Entity)
@@ -85,17 +85,20 @@ namespace RAI_MVC.Repository
                 context.SaveChanges();
             }
         }
-        public static void UpdateLoan(Loan loan)
+        public void UpdateLoan(Loan loan)
         {
             using (Context context = GetContext())
             {
                 context.Loans.Attach(loan);
+
+                var loanEntry = context.Entry(loan);
+                loanEntry.State = EntityState.Modified;
                 //comicBookEntry.Property("IssueNumber").IsModified = false;
 
                 context.SaveChanges();
             }
         }
-        public static void DeleteLoan(int loanID)
+        public void DeleteLoan(int loanID)
         {
             using (Context context = GetContext())
             {
@@ -158,6 +161,24 @@ namespace RAI_MVC.Repository
                 return new SelectList(list, "Value", "Text");
             }
 
+        }
+        public Entity GetEntity(int entityID)
+        {
+            using (Context context = GetContext())
+            {
+                return context.Entity                
+                   .Where(cb => cb.EntityID == entityID)
+                   .SingleOrDefault();
+            }
+        }
+        public Client GetClient(int clientID)
+        {
+            using (Context context = GetContext())
+            {
+                return context.Client
+                   .Where(cb => cb.ClientID == clientID)
+                   .SingleOrDefault();
+            }
         }
         public SelectList GetStatus()
         {

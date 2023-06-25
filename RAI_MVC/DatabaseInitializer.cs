@@ -50,7 +50,9 @@ namespace RAI_MVC
             loan1.Client = client1;
             loan1.State = state;
             loan1.LoanType = loanType;
-
+            loan1.BaileeLetterDate = DateTime.Now;
+            loan1.ClosingDate = DateTime.Now;
+            loan1.LoanMortgageAmount = 100000;
             context.Loans.Add(loan1);
 
             var role = new Role()
