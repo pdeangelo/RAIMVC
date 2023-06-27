@@ -21,35 +21,12 @@ namespace RAI_MVC.Models
 
         public int RoleID { get; set; }
 
-        public int OfficeID { get; set; }
-
-        [Required]
-        [StringLength(100)]
-        public string Email { get; set; }
-
         public bool IsAdmin { get; set; }
-
-        public int Status { get; set; }
-
-        public int? FinanceGroup { get; set; }
-
-        public bool? AllSecurityAccess { get; set; }
-
-        public bool? AllPipelineAccess { get; set; }
-
-        public bool? IsAnalyst { get; set; }
-
-        public bool? IsFinance { get; set; }
-
-        public bool? IsManager { get; set; }
-
-        public bool? FundLevelAccess { get; set; }
-
-        public int? Client { get; set; }
 
         [StringLength(20)]
         public string Password { get; set; }
 
         public virtual Role Role { get; set; }
+
     }
 }

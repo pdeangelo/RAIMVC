@@ -1,6 +1,8 @@
 ﻿using RAI_MVC.Models;
 using System;
 using System.Collections.Generic;
+using System.Data.Entity;
+using System.Diagnostics;
 using System.Linq;
 using System.Web;
 
@@ -8,39 +10,123 @@ namespace RAI_MVC.Repository
 {
     public class UsersRepository
     {
-        private static User[] _users = new User[]
+        public IList<User> GetUsers()
         {
-            new User()
+            using (Context context = GetContext())
             {
-                UserID=1,
-                UserName="Paul",
-                WinUserID="paul",
-                Password="password",
-                //IsADmin = true,
-                //roles = new string[4] {"Volvo", "BMW", "Ford", "Mazda"}
-    }
-        };
-
+                return context.User
+                  .Include(l => l.Role)
+                  .ToList();
+            }
+        }
+        /// <summary>
+        /// Returns a single loan.
+        /// </summary>
+        /// <returns>A fully populated Loan entity instance.</returns>
         public User GetUser(int userID)
         {
-            User user = null;
-
-            foreach (var u in _users)
+            using (Context context = GetContext())
             {
-                if (u.UserID == userID)
-                {
-                    user = u;
-                    break;
-                }
+                return context.User
+                   .Where(cb => cb.UserID == userID)
+                   .SingleOrDefault();
             }
-            return user;
-
         }
-        public User[] GetUsers()
+        public static void AddUser(User user)
         {
-            
-            return _users;
+            using (Context context = GetContext())
+            {
+                context.User.Add(user);
 
+                context.SaveChanges();
+            }
         }
+        public void UpdateUser(User user)
+        {
+            using (Context context = GetContext())
+            {
+                context.User.Attach(user);
+
+                var loanEntity = context.Entry(user);
+
+                context.SaveChanges();
+            }
+        }
+        public void DeleteUser(int userID)
+        {
+            using (Context context = GetContext())
+            {
+                var entity = new User() { UserID = userID };
+                context.Entry(entity).State = EntityState.Deleted;
+
+                context.SaveChanges();
+            }
+        }
+
+
+
+        public IList<Role> GetRoles()
+        {
+            using (Context context = GetContext())
+            {
+                return context.Role
+                  .ToList();
+            }
+        }
+        /// <summary>
+        /// Returns a single loan.
+        /// </summary>
+        /// <returns>A fully populated Loan entity instance.</returns>
+        public Role GetRole(int roleID)
+        {
+            using (Context context = GetContext())
+            {
+                return context.Role
+                   .Where(cb => cb.RoleID == roleID)
+                   .SingleOrDefault();
+            }
+        }
+        public static void AddRole(Role role)
+        {
+            using (Context context = GetContext())
+            {
+                context.Role.Add(role);
+
+                context.SaveChanges();
+            }
+        }
+        public void UpdateRole(Role role)
+        {
+            using (Context context = GetContext())
+            {
+                context.Role.Attach(role);
+
+                var loanEntity = context.Entry(role);
+
+                context.SaveChanges();
+            }
+        }
+        public void DeleteRole(int roleID)
+        {
+            using (Context context = GetContext())
+            {
+                var entity = new Role() { RoleID = roleID };
+                context.Entry(entity).State = EntityState.Deleted;
+
+                context.SaveChanges();
+            }
+        }
+
+        /// <summary>
+        /// Private method that returns a database context.
+        /// </summary>
+        /// <returns>An instance of the Context class.</returns>
+        static Context GetContext()
+        {
+            var context = new Context();
+            context.Database.Log = (message) => Debug.WriteLine(message);
+            return context;
+        }
+
     }
 }

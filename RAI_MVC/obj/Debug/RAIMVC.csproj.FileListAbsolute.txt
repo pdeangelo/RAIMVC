@@ -73,3 +73,7 @@ C:\Users\pdean\Documents\SourceCode\RAI_MVC\RAIMVC\RAI_MVC\obj\Debug\RAI_MVC.dll
 C:\Users\pdean\Documents\SourceCode\RAI_MVC\RAIMVC\RAI_MVC\obj\Debug\RAI_MVC.pdb
 C:\Users\pdean\Documents\SourceCode\RAI_MVC\RAIMVC\RAI_MVC\bin\Spire.Doc.dll
 C:\Users\pdean\Documents\SourceCode\RAI_MVC\RAIMVC\RAI_MVC\bin\Spire.Doc.xml
+C:\Users\pdean\Documents\SourceCode\RAI_MVC\RAIMVC\RAI_MVC\bin\DocumentFormat.OpenXml.dll
+C:\Users\pdean\Documents\SourceCode\RAI_MVC\RAIMVC\RAI_MVC\bin\DocumentFormat.OpenXml.xml
+C:\Users\pdean\Documents\SourceCode\RAI_MVC\RAIMVC\RAI_MVC\obj\Debug\RAI_MVC.Migrations.InitialCreate.resources
+C:\Users\pdean\Documents\SourceCode\RAI_MVC\RAIMVC\RAI_MVC\obj\Debug\RAIMVC.csproj.GenerateResource.cache

@@ -11,7 +11,7 @@ namespace RAI_MVC.Models
     {
         public Role()
         {
-            Users = new HashSet<User>();
+            Users = new List<User>();
         }
 
         public int RoleID { get; set; }

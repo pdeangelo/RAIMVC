@@ -1,0 +1,45 @@
+﻿@model List<RAI_MVC.Models.Investor>
+@{
+    ViewBag.Title = "Investors";
+}
+@if (TempData["Message"] != null)
+{
+    <div class="alert alert-success alert-dismissible" role="alert">
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+        @TempData["Message"]
+    </div>
+}
+
+@using (Html.BeginForm("InvestorEdit", "RAI", FormMethod.Post))
+{
+    <div class="col-lg-12">
+        <table class="table table-striped" id="ClientTable">
+            <tr class="d-flex">
+                <th>Investor Name</th>
+                <th>Custodian Name</th>
+                <th class="col-lg-3">&nbsp;</th>
+            </tr>
+            @for (int index = 0; index < Model.Count; index++)
+            {
+            <tr>
+                <td>@Model[index].InvestorName</td>
+                <td>@Model[index].CustodianName</td>
+                <td>
+                    <div class="pull-right">
+                        <a href="@Url.Action("EditInvestor", new { id = @Model[index].InvestorID })" class="btn btn-warning btn-sm margin-right">
+                            <span class="glyphicon glyphicon-edit"></span><span class="hidden-xs"> </span>
+                        </a>
+                        <a href="@Url.Action("DeleteInvestor", new { id = @Model[index].InvestorID })" class="btn btn-danger btn-sm">
+                            <span class="glyphicon glyphicon-trash"></span><span class="hidden-xs"> </span>
+                        </a>
+                    </div>
+                </td>
+            </tr>
+            }
+
+        </table>
+    </div>
+}
+

@@ -6,6 +6,8 @@ using System.Web;
 using System.Data.Entity;
 using System.Web.Mvc;
 using System.Diagnostics;
+using System.Data.SqlClient;
+using System.Data;
 
 namespace RAI_MVC.Repository
 {
@@ -216,6 +218,24 @@ namespace RAI_MVC.Repository
             }
 
         }
+        public SelectList GetRoles()
+        {
+            using (Context context = GetContext())
+            {
+                var roles = context.Role.ToList();
+                List<SelectListItem> list = new List<SelectListItem>();
+                foreach (Role role in roles)
+                {
+                    list.Add(new SelectListItem()
+                    {
+                        Value = role.RoleID.ToString(),
+                        Text = role.RoleName
+                    });
+                }
+                return new SelectList(list, "Value", "Text");
+            }
+
+        }
         public SelectList GetUsers()
         {
             using (Context context = GetContext())
@@ -254,12 +274,30 @@ namespace RAI_MVC.Repository
 
 
         }
+        public List<SalesReport> GetSalesReport(DateTime fDate, DateTime tDate)
+        {
+            using (Context context = GetContext())
+            {
+                var tDateParameter = new SqlParameter("@FromDate", SqlDbType.DateTime);
+                var fDateParameter = new SqlParameter("@ToDate", SqlDbType.DateTime);
 
-        /// <summary>
-        /// Private method that returns a database context.
-        /// </summary>
-        /// <returns>An instance of the Context class.</returns>
-        static Context GetContext()
+                //var result = context.Database
+                //    .SqlQuery<SalesReport>("TableFunding_SalesReport @FromDate @ToDate", tDateParameter, fDateParameter)
+                //    .ToList();
+
+                var result = context.Database.SqlQuery<SalesReport>(
+                    "TableFunding_SalesReport @FromDate, @ToDate",
+                    new SqlParameter("@FromDate", fDate),
+                    new SqlParameter("@ToDate", tDate)
+                    ).ToList();
+                return result;
+            }
+}
+/// <summary>
+/// Private method that returns a database context.
+/// </summary>
+/// <returns>An instance of the Context class.</returns>
+static Context GetContext()
         {
             var context = new Context();
             context.Database.Log = (message) => Debug.WriteLine(message);
