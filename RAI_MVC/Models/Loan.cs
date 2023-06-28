@@ -145,20 +145,24 @@ namespace RAI_MVC.Models
         //end fee fields
         //Computed Fields
         [DatabaseGenerated(DatabaseGeneratedOption.Computed)]
-        public double? DaysOutstandingClosed
+        public double DaysOutstandingClosed
         {
             get {
-
-                return DateDepositedInEscrow.Value.Subtract(InvestorProceedsDate.Value).TotalDays;
+                if (InvestorProceedsDate == null)
+                    return 0;
+                else
+                    return (double)DateDepositedInEscrow.Value.Subtract(InvestorProceedsDate.Value).TotalDays;
             }
         }
         [DatabaseGenerated(DatabaseGeneratedOption.Computed)]
-        public double? DaysOutstandingPending
+        public double DaysOutstandingPending
         {
             get
             {
-                if (OpenMortgageBalance > 1)
-                    return DateTime.Now.Subtract(InvestorProceedsDate.Value).TotalDays;
+                if (InvestorProceedsDate == null)
+                    return 0;
+                else if (OpenMortgageBalance > 1)
+                    return (double)DateTime.Now.Subtract(InvestorProceedsDate.Value).TotalDays;
                 else
                     return 0;
             }
@@ -214,7 +218,7 @@ namespace RAI_MVC.Models
 
                 if (DaysOutstandingClosed > 0)
                 {
-                    daysOutstandingCalc = DaysOutstandingClosed.Value;
+                    daysOutstandingCalc = DaysOutstandingClosed;
                     //Period 1
 
                     daysOutstandingCalc = daysOutstandingCalc - OriginationDiscountNumDays.Value;
@@ -291,19 +295,21 @@ namespace RAI_MVC.Models
             get
             { double interestIncome = 0;
                 if (InterestBasedOnAdvance.Value)
-                    interestIncome = DaysOutstandingClosed.Value * DailyInterestRate.Value * LoanAdvanceAmount.Value;
+                    interestIncome = DaysOutstandingClosed * DailyInterestRate.Value * LoanAdvanceAmount.Value;
                 else
-                    interestIncome = DaysOutstandingClosed.Value * DailyInterestRate.Value * LoanMortgageAmount.Value;
+                    interestIncome = DaysOutstandingClosed * DailyInterestRate.Value * LoanMortgageAmount.Value;
                 return interestIncome;
             }
         }
         [DatabaseGenerated(DatabaseGeneratedOption.Computed)]
-        public Double? AnnualizedYield
+        public Double AnnualizedYield
         {
             get
             {
-                if (InvestorProceeds.Value > 0 && LoanAdvanceAmount.Value != 0 && DaysOutstandingClosed.Value > 0)
-                    return TotalFees / LoanAdvanceAmount / DaysOutstandingClosed * 360;
+                if (InvestorProceeds == null || LoanAdvanceAmount == null || DaysOutstandingClosed == null)
+                    return 0;
+                if (InvestorProceeds.Value > 0 && LoanAdvanceAmount.Value != 0 && DaysOutstandingClosed > 0)
+                    return (double)(TotalFees / LoanAdvanceAmount / DaysOutstandingClosed * 360);
                 else
                     return 0;
             }

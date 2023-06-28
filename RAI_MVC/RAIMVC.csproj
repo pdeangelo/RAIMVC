@@ -196,6 +196,8 @@
     <Content Include="Views\RAI\_RoleForm.cshtml" />
     <Content Include="Views\RAI\EditRole.cshtml" />
     <Content Include="Views\RAI\SalesReport.cshtml" />
+    <Content Include="Views\RAI\CollectionReport.cshtml" />
+    <Content Include="Views\RAI\TrackingReport.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
