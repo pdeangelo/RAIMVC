@@ -13,7 +13,7 @@ namespace RAI_MVC
         public Context() : base("RAI")
         {
             //Database.SetInitializer(new DatabaseInitializer());
-            Database.SetInitializer<Context>(null);
+            //Database.SetInitializer<Context>(null);
         }
         public DbSet<Loan> Loans { get; set; }
         public DbSet<LoanStatus> LoanStatus { get; set; }

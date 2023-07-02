@@ -10,6 +10,7 @@ using Spire.Doc;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Spreadsheet;
+using ClosedXML.Excel;
 
 namespace RAI_MVC.Controllers
 {
@@ -111,7 +112,7 @@ namespace RAI_MVC.Controllers
                 //for (int i = 0; i < GridView1.Rows.Count; i++)
                 //{
                 //    CheckBox chkIsChecked = (CheckBox)GridView1.Rows[i].FindControl("chkIsChecked");
-                //    int loanID = Convert.ToInt16(GridView1.DataKeys[i].Value);
+                //    int loanID = Convert.ToInt16(GridView1.DataKeys[i)Value);
                 //    if (chkIsChecked.Checked)
                 //    {
                 //        TableFundingLoan loan = new TableFundingLoan(loanID);
@@ -1383,6 +1384,190 @@ namespace RAI_MVC.Controllers
             return View(fromToDate);
         }
 
+        public ActionResult AgingReport()
+        {
+            var fromToDate = new FromToDate();
+            return View(fromToDate);
+        }
+        public ActionResult Dashboard()
+        {
+            return View("");
+        }
+        [HttpPost]
+        public JsonResult RunAgingReport(DateTime? dtFromDate, DateTime? dtToDate)
+        {
+            try
+            {
+
+                DateTime fromDate = new DateTime();
+                DateTime toDate = new DateTime();
+
+                //if (!dtFromDate.SelectedDate.HasValue)
+                //{
+                //    ErrorLabel.Content = "Please enter a valid date";
+                //    return;
+                //}
+                //else
+                //    fromDate = dtFromDate.SelectedDate.Value;
+                //if (!dtToDate.SelectedDate.HasValue)
+                //{
+                //    ErrorLabel.Content = "Please enter a valid date";
+                //    return;
+                //}
+                //else
+                //    toDate = dtToDate.SelectedDate.Value;
+                //fromDate = dtFromDate.Value;
+                //toDate = dtToDate.Value;
+                var rptData = _loanRepository.GetLoans();
+
+
+                string client = "";
+                string entity = "";
+                using (var workbook = new XLWorkbook())
+                {
+                    var ws = workbook.Worksheets.Add("Aging Report");
+                    ws.Cell("A2").Value = "Master Receivable Report";
+                    ws.Cell("A3").FormulaA1 = "=Today()";
+
+                    ws.Cell("A3").Style.NumberFormat.Format = "yyyy-mm-dd";
+
+                    ws.Range("E5:F200").Style.NumberFormat.Format = "#,##0.00";
+
+                    ws.Range("E5:F200").Style.NumberFormat.Format = "#,##0.00";
+                    ws.Range("H5:H200").Style.NumberFormat.Format = "#,##0";
+
+                    ws.Range("I5:I200").Style.NumberFormat.Format = "#,##0.00";
+                    ws.Range("J5:J200").Style.NumberFormat.Format = "0.00%";
+                    ws.Range("G5:G200").Style.NumberFormat.Format = "yyyy-mm-dd";
+
+                    ws.Cell("A2").Style.Font.FontSize = 18;
+                    ws.Cell("A3").Style.Font.FontSize = 18;
+
+                    ws.Range(4, 1, 4, 38).Style.Font.FontSize = 14;
+
+
+                    ws.Range(4, 1, 4, 38).Style.Fill.PatternType = XLFillPatternValues.Solid;
+
+                    ws.Range(4, 1, 4, 38).Style.Fill.SetBackgroundColor(XLColor.DarkGray);
+
+                    ws.Range(4, 1, 4, 38).Style.Font.SetFontColor(XLColor.White);
+                    ws.Cell("A4").Value = "Client Name";
+                    ws.Cell("B4").Value = "Entity Name";
+                    ws.Cell("C4").Value = "Loan Number";
+                    ws.Cell("D4").Value = "Name";
+                    ws.Cell("E4").Value = "Open Mortgage Balance";
+                    ws.Cell("F4").Value = "Open Advance Balance";
+                    ws.Cell("G4").Value = "Date Deposited in Escrow";
+                    ws.Cell("H4").Value = "Days Outstanding (pending)";
+                    ws.Cell("I4").Value = "Appraisal";
+                    ws.Cell("J4").Value = "Appraisal %";
+
+                    int clientStartRow = 0;
+                    int clientEntityStartRow = 0;
+                    string rowType = "";
+                    //double totalOpenMortgageBalance = 0;
+                    //double totalOpenAdvanceBalance = 0;
+                    int dataStartRow = 5;
+                    int dataEndRow = 0;
+                    int row = 5;
+                    foreach (var loan in rptData)
+                    {
+
+                        if (row == dataStartRow)
+                        {
+                            client = loan.Client.ClientName;
+                            entity = loan.Entity.EntityName;
+                            clientStartRow = row;
+                            clientEntityStartRow = row;
+                        }
+                        if (loan.Client.ClientName != client)
+                        {
+                            ws.Cell(row, 1).Value = client;
+                            ws.Cell(row, 4).Value = "";
+
+                            ws.Cell(row, 5).FormulaA1 = "=SUBTOTAL(9,E" + clientStartRow + ":E" + (row - 1) + ")";
+                            ws.Cell(row, 6).FormulaA1 = "=SUBTOTAL(9,F" + clientStartRow + ":F" + (row - 1) + ")";
+
+                            ws.Cell(row, 8).Value = "";
+                            ws.Cell(row, 9).Value = "";
+                            ws.Cell(row, 10).Value = "";
+                            ws.Cell(row, 11).Value = "";
+                            ws.Range(row, 1, row, 11).Style.Font.Bold = true;
+                            ws.Range(row, 1, row, 11).Style.Font.FontSize = 12;
+
+                            ws.Range(row, 1, row, 11).Style.Fill.PatternType = XLFillPatternValues.Solid;
+
+                            ws.Range(row, 1, row, 11).Style.Fill.SetBackgroundColor(XLColor.LightGray);
+                            row++;
+
+                            clientStartRow = row;
+                            clientEntityStartRow = row;
+                            client = loan.Client.ClientName;
+                            entity = loan.Entity.EntityName;
+                        }
+
+                        ws.Cell(row, 1).Value = loan.Client.ClientName;
+                        ws.Cell(row, 2).Value = loan.Entity.EntityName;
+                        ws.Cell(row, 3).Value = loan.LoanNumber;
+                        ws.Cell(row, 4).Value = loan.LoanMortgagee;
+                        ws.Cell(row, 5).Value = loan.OpenMortgageBalance;
+                        ws.Cell(row, 6).Value = loan.OpenAdvanceBalance;
+                        ws.Cell(row, 7).Value = loan.DateDepositedInEscrow;
+                        ws.Cell(row, 8).Value = loan.DaysOutstandingPending;
+                        ws.Cell(row, 9).Value = loan.LoanUWAppraisalAmount;
+                        ws.Cell(row, 10).Value = loan.AppraisalPcnt;
+
+
+                        row++;
+                    }
+                    //Client Total
+                    ws.Cell(row, 1).Value = client;
+                    ws.Cell(row, 4).Value = "";
+
+                    ws.Cell(row, 5).FormulaA1 = "=SUBTOTAL(9,E" + clientStartRow + ":E" + (row - 1) + ")";
+                    ws.Cell(row, 6).FormulaA1 = "=SUBTOTAL(9,F" + clientStartRow + ":F" + (row - 1) + ")";
+
+                    ws.Cell(row, 8).Value = "";
+                    ws.Cell(row, 9).Value = "";
+                    ws.Cell(row, 10).Value = "";
+                    ws.Cell(row, 11).Value = "";
+                    ws.Range(row, 1, row, 11).Style.Font.Bold = true;
+                    ws.Range(row, 1, row, 11).Style.Font.FontSize = 12;
+
+                    ws.Range(row, 1, row, 11).Style.Fill.PatternType = XLFillPatternValues.Solid;
+
+                    ws.Range(row, 1, row, 11).Style.Fill.SetBackgroundColor(XLColor.LightGray);
+                    //Grand Total
+                    row++;
+                    ws.Cell(row, 1).Value = "Total";
+                    ws.Cell(row, 4).Value = "";
+                    ws.Cell(row, 5).FormulaA1 = "=SUBTOTAL(9,E" + dataStartRow + ":E" + (row - 1) + ")";
+                    ws.Cell(row, 6).FormulaA1 = "=SUBTOTAL(9,F" + dataStartRow + ":F" + (row - 1) + ")";
+
+                    ws.Cell(row, 8).Value = "";
+                    ws.Range(row, 1, row, 11).Style.Font.Bold = true;
+                    ws.Range(row, 1, row, 11).Style.Font.FontSize = 14;
+
+                    ws.Range(row, 1, row, 11).Style.Fill.PatternType = XLFillPatternValues.Solid;
+
+                    ws.Range(row, 1, row, 11).Style.Fill.SetBackgroundColor(XLColor.DarkGray);
+
+                    ws.Range(row, 1, row, 11).Style.Font.SetFontColor(XLColor.White);
+
+
+                    ws.Columns("A:P").AdjustToContents();
+                    workbook.SaveAs("C:\\Users\\pdean\\AgingReport.xlsx");
+                }
+            }
+            catch (Exception ex)
+            {
+                //ErrorLabel.Content = ex.Message;
+                //ErrorLabel.Foreground = new SolidColorBrush(Colors.Red);
+            }
+
+            System.Diagnostics.Process.Start("C:\\Users\\pdean\\AgingReport.xlsx");
+            return Json("");
+        }
         [HttpPost]
         public JsonResult RunTrackingReport(DateTime? dtFromDate, DateTime? dtToDate)
         {
@@ -1410,399 +1595,221 @@ namespace RAI_MVC.Controllers
                 //toDate = dtToDate.Value;
                 var rptData = _loanRepository.GetLoans();
 
-                using (SpreadsheetDocument spreadsheetDocument = SpreadsheetDocument.Create("C:\\Users\\pdean\\TrackingReport.xlsx", SpreadsheetDocumentType.Workbook))
+               
+                using (var workbook = new XLWorkbook())
                 {
-                    WorkbookPart workbookPart = spreadsheetDocument.AddWorkbookPart();
+                    //    ExcelWorksheet ws = pck.Workbook.Worksheets.Add("Aging Report");
+                    var ws = workbook.Worksheets.Add("Tracking Report");
 
-                    workbookPart.Workbook = new Workbook();
-                    WorksheetPart worksheetPart = workbookPart.AddNewPart<WorksheetPart>();
-                    SheetData sheetData = new SheetData();
-                    worksheetPart.Worksheet = new Worksheet(sheetData);
+                    //ws.Cells["A4"].LoadFromDataTable(report.Tables[0], true);
+                    ws.Cell("A2").Value = "Tracking Report";
+                    ws.Cell("A3").FormulaA1 = "=Today()";
+                    ws.Cell("A3").Style.NumberFormat.Format = "yyyy-mm-dd";
 
-                    Sheets sheets = spreadsheetDocument.WorkbookPart.Workbook.AppendChild<Sheets>(new Sheets());
-                    Sheet sheet = new Sheet()
-                    {
-                        Id = spreadsheetDocument.WorkbookPart.GetIdOfPart(worksheetPart),
-                        SheetId = 1,
-                        Name = "Sheet1"
-                    };
+                    ws.Cell("A2").Style.Font.FontSize = 18;
+                    ws.Cell("A3").Style.Font.FontSize = 18;
 
-                    #region Headers
-                    Row headerRow = new Row() { RowIndex = 1 };
-                    Cell header = new Cell() { CellReference = "A1", CellValue = new CellValue("Client Name"), DataType = CellValues.String };
-                    headerRow.Append(header);
+                    ws.Range("D5:D3000").Style.NumberFormat.Format = "#,##0.00";
+                    ws.Range("G5:I3000").Style.NumberFormat.Format = "#,##0.00";
+                    ws.Range("P5:P3000").Style.NumberFormat.Format = "#,##0.00";
+                    ws.Range("R5:R3000").Style.NumberFormat.Format = "#,##0.00";
+                    ws.Range("T5:Z3000").Style.NumberFormat.Format = "#,##0.00";
+                    ws.Range("AH5:AH3000").Style.NumberFormat.Format = "#,##0.00";
 
-                    Cell header1 = new Cell() { CellReference = "B1", CellValue = new CellValue("Loan ID"), DataType = CellValues.String };
-                    headerRow.Append(header1);
+                    ws.Range("E5:E3000").Style.NumberFormat.Format = "0%";
+                    ws.Range("AG5:AG3000").Style.NumberFormat.Format = "0%";
+                    ws.Range("K5:K3000").Style.NumberFormat.Format = "0.00%";
+                    ws.Range("M5:O3000").Style.NumberFormat.Format = "0.00%";
 
-                    Cell header2 = new Cell() { CellReference = "C1", CellValue = new CellValue("Loan Number"), DataType = CellValues.String };
-                    headerRow.Append(header2);
-                    Cell header3 = new Cell() { CellReference = "D1", CellValue = new CellValue("Loan Mortgagee"), DataType = CellValues.String };
-                    headerRow.Append(header3);
-                    Cell header4 = new Cell() { CellReference = "E1", CellValue = new CellValue("Loan Mortgage Amount"), DataType = CellValues.String };
-                    headerRow.Append(header4);
-                    Cell header5 = new Cell() { CellReference = "F1", CellValue = new CellValue("Advance Rate"), DataType = CellValues.String };
-                    headerRow.Append(header5);
-                    Cell header6 = new Cell() { CellReference = "G1", CellValue = new CellValue("Loan Property Address"), DataType = CellValues.String };
-                    headerRow.Append(header6);
-                    Cell header7 = new Cell() { CellReference = "H1", CellValue = new CellValue("Advance Balance"), DataType = CellValues.String };
-                    headerRow.Append(header7);
-                    Cell header8 = new Cell() { CellReference = "I1", CellValue = new CellValue("Wire Fee"), DataType = CellValues.String };
-                    headerRow.Append(header8);
-                    Cell header9 = new Cell() { CellReference = "J1", CellValue = new CellValue("Advance With Wire Fee"), DataType = CellValues.String };
-                    headerRow.Append(header9);
-                    Cell header10 = new Cell() { CellReference = "K1", CellValue = new CellValue("Date Deposited In Escrow"), DataType = CellValues.String };
-                    headerRow.Append(header10);
-                    Cell header11 = new Cell() { CellReference = "L1", CellValue = new CellValue("Loan Interest Rate"), DataType = CellValues.String };
-                    headerRow.Append(header11);
-                    Cell header12 = new Cell() { CellReference = "M1", CellValue = new CellValue("Underwriting Fee"), DataType = CellValues.String };
-                    headerRow.Append(header12);
-                    Cell header13 = new Cell() { CellReference = "N1", CellValue = new CellValue("Minimum Interest"), DataType = CellValues.String };
-                    headerRow.Append(header13);
-                    Cell header14 = new Cell() { CellReference = "O1", CellValue = new CellValue("Greater of Min and Coupon Interest"), DataType = CellValues.String };
-                    headerRow.Append(header14);
+                    ws.Range("S5:S3000").Style.NumberFormat.Format = "#,##0";
+                    ws.Range("AA5:SAA000").Style.NumberFormat.Format = "#,##0";
 
-                    Cell header15 = new Cell() { CellReference = "P1", CellValue = new CellValue("Daily Interest Rate"), DataType = CellValues.String };
-                    headerRow.Append(header15);
+                    ws.Range(4, 1, 4, 38).Style.Font.FontSize = 14;
+                    ws.Range(4, 1, 4, 38).Style.Fill.PatternType = XLFillPatternValues.Solid;
 
-                    Cell header16 = new Cell() { CellReference = "Q1", CellValue = new CellValue("Origination Discount"), DataType = CellValues.String };
-                    headerRow.Append(header16);
+                    ws.Range(4, 1, 4, 38).Style.Fill.SetBackgroundColor(XLColor.DarkGray);
+                    ws.Range(4, 1, 4, 38).Style.Font.SetFontColor(XLColor.White);
+                    ws.Cell("A4").Value = "Client Name";
+                    ws.Cell("B4").Value = "Loan Number";
+                    ws.Cell("C4").Value = "Loan Mortgagee";
+                    ws.Cell("D4").Value = "Loan Mortgage Amount";
+                    ws.Cell("E4").Value = "Advance Rate";
+                    ws.Cell("F4").Value = "Loan Property Address";
+                    ws.Cell("G4").Value = "Advance Balance";
+                    ws.Cell("H4").Value = "Wire Fee";
+                    ws.Cell("I4").Value = "Advance With Wire Fee";
+                    ws.Cell("J4").Value = "Date Deposited In Escrow";
+                    ws.Cell("K4").Value = "Loan Interest Rate";
+                    ws.Cell("L4").Value = "Underwriting Fee";
+                    ws.Cell("M4").Value = "Minimum Interest";
+                    ws.Cell("N4").Value = "Greater of Min and Coupon Interest";
+                    ws.Cell("O4").Value = "Daily Interest Rate";
+                    ws.Cell("P4").Value = "Origination Discount";
+                    ws.Cell("Q4").Value = "Investor Proceeds Date";
+                    ws.Cell("R4").Value = "Investor Proceeds";
+                    ws.Cell("S4").Value = "Days Outstanding Closed";
+                    ws.Cell("T4").Value = "Interest Fee";
+                    ws.Cell("U4").Value = "Origination Fee";
+                    ws.Cell("V4").Value = "Underwriting Fee";
+                    ws.Cell("W4").Value = "Total Fees";
+                    ws.Cell("X4").Value = "Client Proceeds";
+                    ws.Cell("Y4").Value = "Open Mortgage Balance";
+                    ws.Cell("Z4").Value = "OpenAdvance Balance";
+                    ws.Cell("AA4").Value = "Days Outstanding Pending";
+                    ws.Cell("AB4").Value = "Annualized Yield";
+                    ws.Cell("AC4").Value = "Entity Name";
+                    ws.Cell("AD4").Value = "Client Number";
+                    ws.Cell("AE4").Value = "Investor Name";
+                    ws.Cell("AF4").Value = "Loan Status";
+                    ws.Cell("AG4").Value = "Appraisal Pcnt";
+                    ws.Cell("AH4").Value = "Appraisal";
+                    ws.Cell("AI4").Value = "Loan Funding Date";
+                    ws.Cell("AJ4").Value = "State";
+                    ws.Cell("AK4").Value = "Dwelling Type";
+                    ws.Cell("AL4").Value = "Loan Type";
+                    ws.Cell("AM4").Value = "RowType";
+                    ws.Cell("AN4").Value = "SortOrder";
+                    ws.Cell("AO4").Value = "SortField";
+                    string client = "";
+                    string entity = "";
+                    int clientStartRow = 0;
+                    int clientEntityStartRow = 0;
+                    string rowType = "";
 
-                    Cell header17 = new Cell() { CellReference = "R1", CellValue = new CellValue("Investor Proceeds Date"), DataType = CellValues.String };
-                    headerRow.Append(header17);
-
-                    Cell header18 = new Cell() { CellReference = "S1", CellValue = new CellValue("Investor Proceeds"), DataType = CellValues.String };
-                    headerRow.Append(header18);
-                    Cell header19 = new Cell() { CellReference = "T1", CellValue = new CellValue("Days Outstanding Closed"), DataType = CellValues.String };
-                    Cell header20 = new Cell() { CellReference = "U1", CellValue = new CellValue("Interest Fee"), DataType = CellValues.String };
-                    Cell header21 = new Cell() { CellReference = "V1", CellValue = new CellValue("Origination Fee"), DataType = CellValues.String };
-                    Cell header22 = new Cell() { CellReference = "W1", CellValue = new CellValue("Underwriting Fee"), DataType = CellValues.String };
-                    Cell header23 = new Cell() { CellReference = "X1", CellValue = new CellValue("Total Fees"), DataType = CellValues.String };
-                    Cell header24 = new Cell() { CellReference = "Y1", CellValue = new CellValue("Client Proceeds"), DataType = CellValues.String };
-                    Cell header25 = new Cell() { CellReference = "Z1", CellValue = new CellValue("Open Mortgage Balance"), DataType = CellValues.String };
-                    Cell header26 = new Cell() { CellReference = "AA1", CellValue = new CellValue("OpenAdvance Balance"), DataType = CellValues.String };
-                    Cell header27 = new Cell() { CellReference = "AB1", CellValue = new CellValue("Days Outstanding Pending"), DataType = CellValues.String };
-                    Cell header28 = new Cell() { CellReference = "AC1", CellValue = new CellValue("Annualized Yield"), DataType = CellValues.String };
-                    Cell header29 = new Cell() { CellReference = "AD1", CellValue = new CellValue("Entity Name"), DataType = CellValues.String };
-                    Cell header30 = new Cell() { CellReference = "AE1", CellValue = new CellValue("Client Number"), DataType = CellValues.String };
-                    Cell header31 = new Cell() { CellReference = "AF1", CellValue = new CellValue("Investor Name"), DataType = CellValues.String };
-                    Cell header32 = new Cell() { CellReference = "AG1", CellValue = new CellValue("Loan Status"), DataType = CellValues.String };
-                    Cell header33 = new Cell() { CellReference = "AH1", CellValue = new CellValue("Appraisal Pcnt"), DataType = CellValues.String };
-                    Cell header34 = new Cell() { CellReference = "AI1", CellValue = new CellValue("Appraisal"), DataType = CellValues.String };
-                    Cell header35 = new Cell() { CellReference = "AJ1", CellValue = new CellValue("Loan Funding Date"), DataType = CellValues.String };
-                    Cell header36 = new Cell() { CellReference = "AK1", CellValue = new CellValue("State"), DataType = CellValues.String };
-                    Cell header37 = new Cell() { CellReference = "AL1", CellValue = new CellValue("Dwelling Type"), DataType = CellValues.String };
-                    Cell header38 = new Cell() { CellReference = "AM1", CellValue = new CellValue("Loan Type"), DataType = CellValues.String };
-                    Cell header39 = new Cell() { CellReference = "AN1", CellValue = new CellValue("RowType"), DataType = CellValues.String };
-                    Cell header40 = new Cell() { CellReference = "AO1", CellValue = new CellValue("SortOrder"), DataType = CellValues.String };
-                    Cell header41 = new Cell() { CellReference = "AP1", CellValue = new CellValue("SortField"), DataType = CellValues.String };
-                    headerRow.Append(header19);
-                    headerRow.Append(header20);
-                    headerRow.Append(header21);
-                    headerRow.Append(header22);
-                    headerRow.Append(header23);
-                    headerRow.Append(header24);
-                    headerRow.Append(header25);
-                    headerRow.Append(header26);
-                    headerRow.Append(header27);
-                    headerRow.Append(header28);
-                    headerRow.Append(header29);
-                    headerRow.Append(header30);
-                    headerRow.Append(header31);
-                    headerRow.Append(header32);
-                    headerRow.Append(header33);
-                    headerRow.Append(header34);
-                    headerRow.Append(header35);
-                    headerRow.Append(header36);
-                    headerRow.Append(header37);
-                    headerRow.Append(header38);
-                    headerRow.Append(header39);
-                    headerRow.Append(header40);
-                    headerRow.Append(header41);
-
-
-
-
-                    sheetData.Append(headerRow);
-
-                    #endregion
-
-                    int col = 1;
-                    UInt32Value row = 2;
+                    int dataStartRow = 5;
+                    int dataEndRow = 0;
+                    int row = 5;
                     foreach (var loan in rptData)
                     {
-                        Row lastRow = sheetData.Elements<Row>().LastOrDefault();
-                        string cellRef = GetExcelColumnName(col++) + row;
-                        Row detailRow = new Row() { RowIndex = row };
-                        Cell detail = new Cell() { CellReference = cellRef, CellValue = new CellValue(loan.Entity.EntityName), DataType = CellValues.String };
-                        detailRow.Append(detail);
-
-                        string cellRef2 = GetExcelColumnName(col++) + row;
-                        Row detailRow2 = new Row() { RowIndex = row };
-                        Cell detail2 = new Cell() { CellReference = cellRef2, CellValue = new CellValue(loan.Client.ClientName), DataType = CellValues.String };
-                        detailRow.Append(detail2);
-
-                        string cellRef3 = GetExcelColumnName(col++) + row;
-                        Row detailRow3 = new Row() { RowIndex = row };
-                        Cell detail3 = new Cell() { CellReference = cellRef3, CellValue = new CellValue(loan.LoanNumber), DataType = CellValues.String };
-                        detailRow.Append(detail3);
-
-
-                        string cellRef4 = GetExcelColumnName(col++) + row;
-                        Row detailRow4 = new Row() { RowIndex = row };
-                        Cell detail4 = new Cell() { CellReference = cellRef4, CellValue = new CellValue(loan.LoanMortgagee), DataType = CellValues.String };
-                        detailRow.Append(detail4);
-
-                        string cellRef5 = GetExcelColumnName(col++) + row;
-                        Row detailRow5 = new Row() { RowIndex = row };
-                        Cell detail5 = new Cell() { CellReference = cellRef5, CellValue = new CellValue(loan.LoanMortgageAmount.Value), DataType = CellValues.Number };
-                        detailRow.Append(detail5);
-
-                        string cellRef6 = GetExcelColumnName(col++) + row;
-                        Row detailRow6 = new Row() { RowIndex = row };
-                        Cell detail6 = new Cell() { CellReference = cellRef6, CellValue = new CellValue(loan.LoanAdvanceAmount.Value), DataType = CellValues.Number };
-                        detailRow.Append(detail6);
-
-                        string cellRef7 = GetExcelColumnName(col++) + row;
-                        if (loan.InvestorProceeds != null)
+                        if (row == dataStartRow)
                         {
-                            Row detailRow7 = new Row() { RowIndex = row };
-                            Cell detail7 = new Cell() { CellReference = cellRef7, CellValue = new CellValue(loan.InvestorProceeds.Value), DataType = CellValues.Number };
-                            detailRow.Append(detail7);
+                            client = loan.Client.ClientName;
+                            entity = loan.Entity.EntityName;
+                            clientStartRow = row;
+                            clientEntityStartRow = row;
                         }
-                        string cellRef8 = GetExcelColumnName(col++) + row;
-
-                        Row detailRow8 = new Row() { RowIndex = row };
-
-                        Cell detail8 = new Cell() { CellReference = cellRef8, CellValue = new CellValue(loan.AnnualizedYield), DataType = CellValues.Number };
-                        detailRow.Append(detail8);
-
-                        string cellRef9 = GetExcelColumnName(col++) + row;
-
-                        Row detailRow9 = new Row() { RowIndex = row };
-                        Cell detail9 = new Cell() { CellReference = cellRef9, CellValue = new CellValue(loan.DaysOutstandingClosed), DataType = CellValues.Number };
-                        detailRow.Append(detail9);
-
-
-                        string cellRef10 = GetExcelColumnName(col++) + row;
-                        if (loan.InvestorProceedsDate != null)
+                        if (loan.Client.ClientName != client)
                         {
-                            Row detailRow10 = new Row() { RowIndex = row };
-                            Cell detail10 = new Cell() { CellReference = cellRef10, CellValue = new CellValue(loan.InvestorProceedsDate.Value), DataType = CellValues.Date };
-                            detailRow.Append(detail10);
+                            ws.Cell(row, 1).Value = client;
+
+                            ws.Cell(row, 4).FormulaA1 = "=SUBTOTAL(9,D" + clientStartRow + ":D" + (row - 1) + ")";
+                            ws.Cell(row, 8).FormulaA1 = "=SUBTOTAL(9,H" + clientStartRow + ":H" + (row - 1) + ")";
+                            ws.Cell(row, 9).FormulaA1 = "=SUBTOTAL(9,I" + clientStartRow + ":I" + (row - 1) + ")";
+                            ws.Cell(row, 18).FormulaA1 = "=SUBTOTAL(9,R" + clientStartRow + ":R" + (row - 1) + ")";
+                            ws.Cell(row, 20).FormulaA1 = "=SUBTOTAL(9,T" + clientStartRow + ":T" + (row - 1) + ")";
+                            ws.Cell(row, 21).FormulaA1 = "=SUBTOTAL(9,U" + clientStartRow + ":U" + (row - 1) + ")";
+                            ws.Cell(row, 22).FormulaA1 = "=SUBTOTAL(9,V" + clientStartRow + ":V" + (row - 1) + ")";
+                            ws.Cell(row, 23).FormulaA1 = "=SUBTOTAL(9,W" + clientStartRow + ":W" + (row - 1) + ")";
+                            ws.Cell(row, 24).FormulaA1 = "=SUBTOTAL(9,X" + clientStartRow + ":X" + (row - 1) + ")";
+                            ws.Range(row, 1, row, 38).Style.Font.Bold = true;
+                            ws.Range(row, 1, row, 38).Style.Font.FontSize = 12;
+
+                            ws.Range(row, 1, row, 38).Style.Fill.PatternType = XLFillPatternValues.Solid;
+
+                            ws.Range(row, 1, row, 38).Style.Fill.SetBackgroundColor(XLColor.LightGray);
+                            row++;
+
+                            clientStartRow = row;
+                            clientEntityStartRow = row;
+                            client = loan.Client.ClientName;
+                            entity = loan.Entity.EntityName;
                         }
 
+                        ws.Cell(row, 1).Value = loan.Client.ClientName;
+                        ws.Cell(row, 2).Value = loan.LoanNumber;
+                        ws.Cell(row, 3).Value = loan.LoanMortgagee;
+                        ws.Cell(row, 4).Value = loan.LoanMortgageAmount.Value;
+                        ws.Cell(row, 5).Value = loan.LoanAdvanceRate.Value;
+                        ws.Cell(row, 6).Value = loan.LoanPropertyAddress;
+                        ws.Cell(row, 7).Value = loan.LoanAdvanceAmount.Value;
+                        ws.Cell(row, 8).Value = loan.WireFee;
+                        ws.Cell(row, 9).Value = loan.AdvanceWithWireFee;
+                        ws.Cell(row, 10).Value = loan.DateDepositedInEscrow.Value;
+                        ws.Cell(row, 11).Value = loan.LoanInterestRate.Value;
+                        ws.Cell(row, 12).Value = loan.UnderwritingFee.Value;
+                        ws.Cell(row, 13).Value = loan.MinimumInterest.Value;
+                        ws.Cell(row, 14).Value = loan.GreaterofMinandCouponInterest;
+                        ws.Cell(row, 15).Value = loan.DailyInterestRate.Value;
+                        ws.Cell(row, 16).Value = loan.OriginationFee.Value;
+                        ws.Cell(row, 17).Value = loan.InvestorProceedsDate.Value;
+                        ws.Cell(row, 18).Value = loan.InvestorProceeds.Value;
 
-                        string cellRef11 = GetExcelColumnName(col++) + row;
-                        if (loan.InterestFee != null)
-                        {
-                            Row detailRow11 = new Row() { RowIndex = row };
-                            Cell detail11 = new Cell() { CellReference = cellRef11, CellValue = new CellValue(loan.InterestFee.Value), DataType = CellValues.Number };
-                            detailRow.Append(detail11);
-                        }
-                        string cellRef12 = GetExcelColumnName(col++) + row;
-                        if (loan.OriginationFee != null)
-                        {
-                            Row detailRow12 = new Row() { RowIndex = row };
-                            Cell detail12 = new Cell() { CellReference = cellRef12, CellValue = new CellValue(loan.OriginationFee.Value), DataType = CellValues.Number };
-                            detailRow.Append(detail12);
-                        }
-                        string cellRef13 = GetExcelColumnName(col++) + row;
-                        if (loan.UnderwritingFee != null)
-                        {
-                            Row detailRow13 = new Row() { RowIndex = row };
-                            Cell detail13 = new Cell() { CellReference = cellRef13, CellValue = new CellValue(loan.UnderwritingFee.Value), DataType = CellValues.Number };
-                            detailRow.Append(detail13);
-                        }
-
-                        string cellRef14 = GetExcelColumnName(col++) + row;
-                        if (loan.TotalFees != null)
-                        {
-                            Row detailRow14 = new Row() { RowIndex = row };
-                            Cell detail14 = new Cell() { CellReference = cellRef14, CellValue = new CellValue(loan.TotalFees.Value), DataType = CellValues.Number };
-                            detailRow.Append(detail14);
-                        }
-                        //string cellRef15 = GetExcelColumnName(col++) + row;
-                        //Row detailRow15 = new Row() { RowIndex = row };
-                        //Cell detail15 = new Cell() { CellReference = cellRef15, CellValue = new CellValue(loan.Investor.InvestorName), DataType = CellValues.String };
-                        //detailRow.Append(detail15);
-
-                        sheetData.InsertAfter(detailRow, lastRow);
-
+                        ws.Cell(row, 19).Value = loan.DaysOutstandingClosed;
+                        ws.Cell(row, 20).Value = loan.InterestFee.Value;
+                        ws.Cell(row, 21).Value = loan.OriginationFee.Value;
+                        ws.Cell(row, 22).Value = loan.UnderwritingFee.Value;
+                        ws.Cell(row, 23).Value = loan.TotalFees.Value;
+                        ws.Cell(row, 24).Value = loan.MortgageOriginatorProceeds.Value;
+                        ws.Cell(row, 25).Value = loan.OpenMortgageBalance.Value;
+                        ws.Cell(row, 26).Value = loan.OpenAdvanceBalance.Value;
+                        ws.Cell(row, 27).Value = loan.DaysOutstandingPending;
+                        ws.Cell(row, 28).Value = loan.AnnualizedYield;
+                        ws.Cell(row, 29).Value = loan.Entity.EntityName;
+                        ws.Cell(row, 30).Value = "";
+                        ws.Cell(row, 31).Value = loan.Investor.InvestorName;
+                        ws.Cell(row, 32).Value = loan.LoanStatus.LoanStatusName;
+                        ws.Cell(row, 33).Value = loan.AppraisalPcnt;
+                        ws.Cell(row, 34).Value = loan.LoanUWAppraisalAmount.Value;
+                        ws.Cell(row, 35).Value = loan.LoanFundingDate;
+                        ws.Cell(row, 36).Value = loan.State.State1;
+                        ws.Cell(row, 37).Value = loan.DwellingType.DwellingType1;
+                        ws.Cell(row, 38).Value = loan.LoanType.LoanTypeName;
+                        row++;
                     }
-                    sheets.Append(sheet);
-                    workbookPart.Workbook.Save();
 
+                    //Client Total
+                    ws.Cell(row, 1).Value = client;
+
+                    ws.Cell(row, 4).FormulaA1 = "=SUBTOTAL(9,D" + clientStartRow + ":D" + (row - 1) + ")";
+                    ws.Cell(row, 8).FormulaA1 = "=SUBTOTAL(9,H" + clientStartRow + ":H" + (row - 1) + ")";
+                    ws.Cell(row, 9).FormulaA1 = "=SUBTOTAL(9,I" + clientStartRow + ":I" + (row - 1) + ")";
+                    ws.Cell(row, 18).FormulaA1 = "=SUBTOTAL(9,R" + clientStartRow + ":R" + (row - 1) + ")";
+                    ws.Cell(row, 20).FormulaA1 = "=SUBTOTAL(9,T" + clientStartRow + ":T" + (row - 1) + ")";
+                    ws.Cell(row, 21).FormulaA1 = "=SUBTOTAL(9,U" + clientStartRow + ":U" + (row - 1) + ")";
+                    ws.Cell(row, 22).FormulaA1 = "=SUBTOTAL(9,V" + clientStartRow + ":V" + (row - 1) + ")";
+                    ws.Cell(row, 23).FormulaA1 = "=SUBTOTAL(9,W" + clientStartRow + ":W" + (row - 1) + ")";
+                    ws.Cell(row, 24).FormulaA1 = "=SUBTOTAL(9,X" + clientStartRow + ":X" + (row - 1) + ")";
+
+                    ws.Range(row, 1, row, 38).Style.Font.Bold = true;
+                    ws.Range(row, 1, row, 38).Style.Font.FontSize = 12;
+
+                    ws.Range(row, 1, row, 38).Style.Fill.PatternType = XLFillPatternValues.Solid;
+
+                    ws.Range(row, 1, row, 38).Style.Fill.SetBackgroundColor(XLColor.LightGray);
+                    //Grand Total
+                    row++;
+                    ws.Cell(row, 1).Value = "Total";
+                    ws.Cell(row, 4).FormulaA1 = "=SUBTOTAL(9,D" + dataStartRow + ":D" + (row - 1) + ")";
+                    ws.Cell(row, 8).FormulaA1 = "=SUBTOTAL(9,H" + dataStartRow + ":H" + (row - 1) + ")";
+                    ws.Cell(row, 9).FormulaA1 = "=SUBTOTAL(9,I" + dataStartRow + ":I" + (row - 1) + ")";
+                    ws.Cell(row, 18).FormulaA1 = "=SUBTOTAL(9,R" + dataStartRow + ":R" + (row - 1) + ")";
+                    ws.Cell(row, 20).FormulaA1 = "=SUBTOTAL(9,T" + dataStartRow + ":T" + (row - 1) + ")";
+                    ws.Cell(row, 21).FormulaA1 = "=SUBTOTAL(9,U" + dataStartRow + ":U" + (row - 1) + ")";
+                    ws.Cell(row, 22).FormulaA1 = "=SUBTOTAL(9,V" + dataStartRow + ":V" + (row - 1) + ")";
+                    ws.Cell(row, 23).FormulaA1 = "=SUBTOTAL(9,W" + dataStartRow + ":W" + (row - 1) + ")";
+                    ws.Cell(row, 24).FormulaA1 = "=SUBTOTAL(9,X" + dataStartRow + ":X" + (row - 1) + ")";
+
+                    ws.Cell(row, 8).Value = "";
+                    ws.Range(row, 1, row, 38).Style.Font.Bold = true;
+                    ws.Range(row, 1, row, 38).Style.Font.FontSize = 14;
+
+                    ws.Range(row, 1, row, 38).Style.Fill.PatternType = XLFillPatternValues.Solid;
+
+                    ws.Range(row, 1, row, 38).Style.Fill.SetBackgroundColor(XLColor.DarkGray);
+
+                    ws.Range(row, 1, row, 38).Style.Font.SetFontColor(XLColor.White);
+                    ws.Columns("A:AO").AdjustToContents();
+                    workbook.SaveAs("C:\\Users\\pdean\\TrackingReport.xlsx");
                 }
-                System.Diagnostics.Process.Start("C:\\Users\\pdean\\TrackingReport.xlsx");
-                //DataSet report = RunsStoredProc.RunStoredProc("TableFunding_SalesReport", "FromDate", fromDate.ToString(), "ToDate", toDate.ToString(), "", "", "", "", "", "", "", "", "", 0);
-                //ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
 
-                ////tableFunding.Delete();
-                //using (ExcelPackage pck = new ExcelPackage())
-                //{
-                //    ExcelWorksheet ws = pck.Workbook.Worksheets.Add("Sales Report");
-
-                //    ws.Cells["A4"].LoadFromDataTable(report.Tables[0], true);
-                //    ws.Cells["A2"].Value = "Sales Report";
-                //    ws.Cells["A3"].Formula = "=Today()";
-
-                //    ws.Cells["A3"].Style.Numberformat.Format = "yyyy-mm-dd";
-
-                //    ws.Cells["F:G"].Style.Numberformat.Format = "#,##0.00";
-
-                //    ws.Cells["H:H"].Style.Numberformat.Format = "yyyy-mm-dd";
-
-                //    ws.Cells["A2"].Style.Font.Size = 18;
-                //    ws.Cells["A3"].Style.Font.Size = 18;
-
-                //    ws.Cells[4, 1, 4, 38].Style.Font.Size = 14;
-
-
-                //    ws.Cells[4, 1, 4, 38].Style.Fill.PatternType = ExcelFillStyle.Solid;
-
-                //    ws.Cells[4, 1, 4, 38].Style.Fill.BackgroundColor.SetColor(System.Drawing.Color.DarkGray);
-
-                //    ws.Cells[4, 1, 4, 38].Style.Font.Color.SetColor(System.Drawing.Color.White);
-
-
-                //    string client = "";
-                //    string investor = "";
-                //    int clientStartRow = 0;
-                //    int clientInvestorStartRow = 0;
-                //    string rowType = "";
-                //    //double totalOpenMortgageBalance = 0;
-                //    //double totalOpenAdvanceBalance = 0;
-                //    int dataStartRow = 5;
-                //    int dataEndRow = 0;
-                //    for (int row = dataStartRow; row <= 1000; row++)
-                //    {
-                //        if (ws.Cells[row, 1].Value == null)
-                //        {
-                //            break;
-                //        }
-
-                //        if (row == dataStartRow)
-                //        {
-                //            client = ws.Cells[row, 1].Text;
-                //            investor = ws.Cells[row, 3].Text;
-                //            clientStartRow = row;
-                //            clientInvestorStartRow = row;
-                //        }
-
-                //        rowType = ws.Cells[row, 14].Text;
-                //        if (rowType == "Grand Total")
-                //        {
-                //            ws.Cells[row, 4].Value = "";
-                //            ws.Cells[row, 6].Formula = "=SUBTOTAL(9,F" + dataStartRow + ":F" + (row - 1) + ")";
-                //            ws.Cells[row, 7].Formula = "=SUBTOTAL(9,G" + dataStartRow + ":G" + (row - 1) + ")";
-
-                //            ws.Cells[row, 8].Value = "";
-                //            ws.Cells[row, 1, row, 11].Style.Font.Bold = true;
-                //            ws.Cells[row, 1, row, 11].Style.Font.Size = 14;
-
-                //            ws.Cells[row, 1, row, 11].Style.Fill.PatternType = ExcelFillStyle.Solid;
-
-                //            ws.Cells[row, 1, row, 11].Style.Fill.BackgroundColor.SetColor(System.Drawing.Color.DarkGray);
-
-                //            ws.Cells[row, 1, row, 11].Style.Font.Color.SetColor(System.Drawing.Color.White);
-
-                //        }
-
-                //        if (rowType == "Client Total")
-                //        {
-                //            ws.Cells[row, 4].Value = "";
-                //            ws.Cells[row, 6].Formula = "=SUBTOTAL(9,F" + clientStartRow + ":F" + (row - 1) + ")";
-                //            ws.Cells[row, 7].Formula = "=SUBTOTAL(9,G" + clientStartRow + ":G" + (row - 1) + ")";
-
-                //            ws.Cells[row, 8].Value = "";
-                //            ws.Cells[row, 9].Value = "";
-                //            ws.Cells[row, 10].Value = "";
-                //            ws.Cells[row, 11].Value = "";
-                //            ws.Cells[row, 1, row, 11].Style.Font.Bold = true;
-                //            ws.Cells[row, 1, row, 11].Style.Font.Size = 12;
-
-                //            ws.Cells[row, 1, row, 11].Style.Fill.PatternType = ExcelFillStyle.Solid;
-
-                //            ws.Cells[row, 1, row, 11].Style.Fill.BackgroundColor.SetColor(System.Drawing.Color.LightGray);
-                //        }
-
-                //        if (rowType == "Client Investor Total")
-                //        {
-                //            ws.Cells[row, 4].Value = "";
-                //            ws.Cells[row, 6].Formula = "=SUBTOTAL(9,F" + clientInvestorStartRow + ":F" + (row - 1) + ")";
-                //            ws.Cells[row, 7].Formula = "=SUBTOTAL(9,G" + clientInvestorStartRow + ":G" + (row - 1) + ")";
-
-                //            ws.Cells[row, 8].Value = "";
-                //            ws.Cells[row, 9].Value = "";
-                //            ws.Cells[row, 10].Value = "";
-                //            ws.Cells[row, 11].Value = "";
-                //            ws.Cells[row, 1, row, 11].Style.Font.Bold = true;
-                //            ws.Cells[row, 1, row, 11].Style.Font.Size = 13;
-
-                //            ws.Cells[row, 1, row, 11].Style.Fill.PatternType = ExcelFillStyle.Solid;
-
-                //            ws.Cells[row, 1, row, 11].Style.Fill.BackgroundColor.SetColor(System.Drawing.Color.Gray);
-                //        }
-                //        if (rowType == "Detail")
-                //        {
-
-
-                //        }
-                //        if (ws.Cells[row, 1].Text != client && rowType == "Detail")
-                //        {
-                //            investor = "";
-                //            client = ws.Cells[row, 1].Text;
-                //            clientStartRow = row;
-                //        }
-                //        if (ws.Cells[row, 3].Text != investor && rowType == "Detail")
-                //        {
-                //            investor = ws.Cells[row, 3].Text;
-                //            clientInvestorStartRow = row;
-                //        }
-
-                //        dataEndRow = row;
-                //    }
-
-                //    ExcelRange dataRange = ws.Cells[dataStartRow - 1, 1, dataEndRow, 10];
-                //    dataRange.AutoFilter = true;
-
-                //    ws.Cells["A:P"].AutoFitColumns();
-                //    ws.Column(6).Width = 20;
-                //    ws.Column(7).Width = 20;
-
-                //    CommonOpenFileDialog dialog = new CommonOpenFileDialog();
-                //    dialog.InitialDirectory = "C:\\Users";
-                //    dialog.IsFolderPicker = true;
-
-                //    string fileName;
-
-                //    fileName = "";
-
-                //    if (dialog.ShowDialog() == CommonFileDialogResult.Ok)
-                //    {
-                //        fileName = dialog.FileName + "\\" + "SalesReport.xlsx";
-
-                //    }
-
-
-
-                //    //System.IO.FileInfo tableFunding = new System.IO.FileInfo(MyVariables.excelReportFilePath + "SalesReport.xlsx");
-
-                //    System.IO.FileInfo tableFunding = new System.IO.FileInfo(fileName);
-
-
-                //    tableFunding.Delete();
-
-                //    pck.SaveAs(tableFunding);
-                //    System.Diagnostics.Process.Start(fileName);
-                //}
             }
             catch (Exception ex)
             {
                 //ErrorLabel.Content = ex.Message;
                 //ErrorLabel.Foreground = new SolidColorBrush(Colors.Red);
             }
+
+            System.Diagnostics.Process.Start("C:\\Users\\pdean\\TrackingReport.xlsx");
             return Json("");
         }
         [HttpPost]
@@ -1832,337 +1839,169 @@ namespace RAI_MVC.Controllers
                 //toDate = dtToDate.Value;
                 var rptData = _loanRepository.GetLoans();
 
-                using (SpreadsheetDocument spreadsheetDocument = SpreadsheetDocument.Create("C:\\Users\\pdean\\CollectionsReport.xlsx", SpreadsheetDocumentType.Workbook))
+                using (var workbook = new XLWorkbook())
                 {
-                    WorkbookPart workbookPart = spreadsheetDocument.AddWorkbookPart();
+                    //    ExcelWorksheet ws = pck.Workbook.Worksheets.Add("Aging Report");
+                    var ws = workbook.Worksheets.Add("Collection Report");
 
-                    workbookPart.Workbook = new Workbook();
-                    WorksheetPart worksheetPart = workbookPart.AddNewPart<WorksheetPart>();
-                    SheetData sheetData = new SheetData();
-                    worksheetPart.Worksheet = new Worksheet(sheetData);
+                    //ws.Cells["A4"].LoadFromDataTable(report.Tables[0], true);
+                    ws.Cell("A2").Value = "Collection Report";
 
-                    Sheets sheets = spreadsheetDocument.WorkbookPart.Workbook.AppendChild<Sheets>(new Sheets());
-                    Sheet sheet = new Sheet()
-                    {
-                        Id = spreadsheetDocument.WorkbookPart.GetIdOfPart(worksheetPart),
-                        SheetId = 1,
-                        Name = "Sheet1"
-                    };
+                    ws.Cell("A3").FormulaA1 = "=Today()";
 
-                    #region Headers
-                    Row headerRow = new Row() { RowIndex = 1 };
-                    Cell header = new Cell() { CellReference = "A1", CellValue = new CellValue("Entity Name"), DataType = CellValues.String };
-                    headerRow.Append(header);
+                    ws.Cell("A3").Style.NumberFormat.Format = "yyyy-mm-dd";
+                    ws.Cell("A2").Style.Font.FontSize = 18;
+                    ws.Cell("A3").Style.Font.FontSize = 18;
 
-                    Cell header1 = new Cell() { CellReference = "B1", CellValue = new CellValue("Client Name"), DataType = CellValues.String };
-                    headerRow.Append(header1);
+                    ws.Range("E5:G100").Style.NumberFormat.Format = "#,##0.00";
+                    ws.Range("K5:N100").Style.NumberFormat.Format = "#,##0.00";
 
-                    Cell header2 = new Cell() { CellReference = "C1", CellValue = new CellValue("Loan Number"), DataType = CellValues.String };
-                    headerRow.Append(header2);
-                    Cell header3 = new Cell() { CellReference = "D1", CellValue = new CellValue("Loan Mortgagee"), DataType = CellValues.String };
-                    headerRow.Append(header3);
-                    Cell header4 = new Cell() { CellReference = "E1", CellValue = new CellValue("Loan Mortgage Amount"), DataType = CellValues.String };
-                    headerRow.Append(header4);
-                    Cell header5 = new Cell() { CellReference = "F1", CellValue = new CellValue("Loan Advance Amount"), DataType = CellValues.String };
-                    headerRow.Append(header5);
-                    Cell header6 = new Cell() { CellReference = "G1", CellValue = new CellValue("Investor Proceeds"), DataType = CellValues.String };
-                    headerRow.Append(header6);
-                    Cell header7 = new Cell() { CellReference = "H1", CellValue = new CellValue("Yield"), DataType = CellValues.String };
-                    headerRow.Append(header7);
-                    Cell header8 = new Cell() { CellReference = "I1", CellValue = new CellValue("Days Outstanding Closed"), DataType = CellValues.String };
-                    headerRow.Append(header8);
-                    Cell header9 = new Cell() { CellReference = "J1", CellValue = new CellValue("Investor Proceeds Date"), DataType = CellValues.String };
-                    headerRow.Append(header9);
-                    Cell header10 = new Cell() { CellReference = "K1", CellValue = new CellValue("Interest Fee"), DataType = CellValues.String };
-                    headerRow.Append(header10);
-                    Cell header11 = new Cell() { CellReference = "L1", CellValue = new CellValue("Origination Fee"), DataType = CellValues.String };
-                    headerRow.Append(header11);
-                    Cell header12 = new Cell() { CellReference = "M1", CellValue = new CellValue("Underwriting Fee"), DataType = CellValues.String };
-                    headerRow.Append(header12);
-                    Cell header13 = new Cell() { CellReference = "N1", CellValue = new CellValue("Total Fees"), DataType = CellValues.String };
-                    headerRow.Append(header13);
-                    Cell header14 = new Cell() { CellReference = "O1", CellValue = new CellValue("SortOrder"), DataType = CellValues.String };
-                    headerRow.Append(header14);
+                    ws.Range("H5:H100").Style.NumberFormat.Format = "#,##0.00%";
+                    ws.Range("I5:I100").Style.NumberFormat.Format = "#,##0";
+                    ws.Range("J5:J100").Style.NumberFormat.Format = "yyyy-mm-dd";
 
-                    sheetData.Append(headerRow);
-                    #endregion
 
-                    int col = 1;
-                    UInt32Value row = 2;
+                    ws.Range(4, 1, 4, 38).Style.Font.FontSize = 14;
+
+
+                    ws.Range(4, 1, 4, 38).Style.Fill.PatternType = XLFillPatternValues.Solid;
+
+                    ws.Range(4, 1, 4, 38).Style.Fill.SetBackgroundColor(XLColor.DarkGray);
+
+                    ws.Range(4, 1, 4, 38).Style.Font.SetFontColor(XLColor.White);
+
+                    ws.Cell("A4").Value = "Entity Name";
+                    ws.Cell("B4").Value = "Client Name";
+                    ws.Cell("C4").Value = "Loan Number";
+                    ws.Cell("D4").Value = "Loan Mortgagee";
+                    ws.Cell("E4").Value = "Loan Mortgage Amount";
+                    ws.Cell("F4").Value = "Loan Advance Amount";
+                    ws.Cell("G4").Value = "Investor Proceeds";
+                    ws.Cell("H4").Value = "Yield";
+                    ws.Cell("I4").Value = "Days Outstanding Closed";
+                    ws.Cell("J4").Value = "Investor Proceeds Date";
+                    ws.Cell("K4").Value = "Interest Fee";
+                    ws.Cell("L4").Value = "Origination Fee";
+                    ws.Cell("M4").Value = "Underwriting Fee";
+                    ws.Cell("N4").Value = "Total Fees";
+                    ws.Cell("O4").Value = "SortOrder";
+                    string client = "";
+                    string investor = "";
+                    int clientStartRow = 0;
+                    int clientInvestorStartRow = 0;
+                    string rowType = "";
+                    //double totalOpenMortgageBalance = 0;
+                    //double totalOpenAdvanceBalance = 0;
+                    int dataStartRow = 5;
+                    int dataEndRow = 0;
+                    int row = 5;
+
                     foreach (var loan in rptData)
                     {
-                        Row lastRow = sheetData.Elements<Row>().LastOrDefault();
-                        string cellRef = GetExcelColumnName(col++) + row;
-                        Row detailRow = new Row() { RowIndex = row };
-                        Cell detail = new Cell() { CellReference = cellRef, CellValue = new CellValue(loan.Entity.EntityName), DataType = CellValues.String };
-                        detailRow.Append(detail);
-
-                        string cellRef2 = GetExcelColumnName(col++) + row;
-                        Row detailRow2 = new Row() { RowIndex = row };
-                        Cell detail2 = new Cell() { CellReference = cellRef2, CellValue = new CellValue(loan.Client.ClientName), DataType = CellValues.String };
-                        detailRow.Append(detail2);
-
-                        string cellRef3 = GetExcelColumnName(col++) + row;
-                        Row detailRow3 = new Row() { RowIndex = row };
-                        Cell detail3 = new Cell() { CellReference = cellRef3, CellValue = new CellValue(loan.LoanNumber), DataType = CellValues.String };
-                        detailRow.Append(detail3);
-
-
-                        string cellRef4 = GetExcelColumnName(col++) + row;
-                        Row detailRow4 = new Row() { RowIndex = row };
-                        Cell detail4 = new Cell() { CellReference = cellRef4, CellValue = new CellValue(loan.LoanMortgagee), DataType = CellValues.String };
-                        detailRow.Append(detail4);
-
-                        string cellRef5 = GetExcelColumnName(col++) + row;
-                        Row detailRow5 = new Row() { RowIndex = row };
-                        Cell detail5 = new Cell() { CellReference = cellRef5, CellValue = new CellValue(loan.LoanMortgageAmount.Value), DataType = CellValues.Number };
-                        detailRow.Append(detail5);
-
-                        string cellRef6 = GetExcelColumnName(col++) + row;
-                        Row detailRow6 = new Row() { RowIndex = row };
-                        Cell detail6 = new Cell() { CellReference = cellRef6, CellValue = new CellValue(loan.LoanAdvanceAmount.Value), DataType = CellValues.Number };
-                        detailRow.Append(detail6);
-
-                        string cellRef7 = GetExcelColumnName(col++) + row;
-                        if (loan.InvestorProceeds != null)
+                        if (row == dataStartRow)
                         {
-                            Row detailRow7 = new Row() { RowIndex = row };
-                            Cell detail7 = new Cell() { CellReference = cellRef7, CellValue = new CellValue(loan.InvestorProceeds.Value), DataType = CellValues.Number };
-                            detailRow.Append(detail7);
+                            client = loan.Client.ClientName;
+                            //entity = loan.Entity.EntityName;
+                            clientStartRow = row;
+                            //clientEntityStartRow = row;
                         }
-                        string cellRef8 = GetExcelColumnName(col++) + row;
-
-                        Row detailRow8 = new Row() { RowIndex = row };
-
-                        Cell detail8 = new Cell() { CellReference = cellRef8, CellValue = new CellValue(loan.AnnualizedYield), DataType = CellValues.Number };
-                        detailRow.Append(detail8);
-
-                        string cellRef9 = GetExcelColumnName(col++) + row;
-                        
-                        Row detailRow9 = new Row() { RowIndex = row };
-                        Cell detail9 = new Cell() { CellReference = cellRef9, CellValue = new CellValue(loan.DaysOutstandingClosed), DataType = CellValues.Number };
-                        detailRow.Append(detail9);
-                        
-
-                        string cellRef10 = GetExcelColumnName(col++) + row;
-                        if (loan.InvestorProceedsDate != null)
+                        if (loan.Client.ClientName != client)
                         {
-                            Row detailRow10 = new Row() { RowIndex = row };
-                            Cell detail10 = new Cell() { CellReference = cellRef10, CellValue = new CellValue(loan.InvestorProceedsDate.Value), DataType = CellValues.Date };
-                            detailRow.Append(detail10);
+                            ws.Cell(row, 1).Value = client;
+
+                            ws.Cell(row, 4).FormulaA1 = "=SUBTOTAL(9,D" + clientStartRow + ":D" + (row - 1) + ")";
+                            ws.Cell(row, 8).FormulaA1 = "=SUBTOTAL(9,H" + clientStartRow + ":H" + (row - 1) + ")";
+                            ws.Cell(row, 9).FormulaA1 = "=SUBTOTAL(9,I" + clientStartRow + ":I" + (row - 1) + ")";
+                            ws.Cell(row, 18).FormulaA1 = "=SUBTOTAL(9,R" + clientStartRow + ":R" + (row - 1) + ")";
+                            ws.Cell(row, 20).FormulaA1 = "=SUBTOTAL(9,T" + clientStartRow + ":T" + (row - 1) + ")";
+                            ws.Cell(row, 21).FormulaA1 = "=SUBTOTAL(9,U" + clientStartRow + ":U" + (row - 1) + ")";
+                            ws.Cell(row, 22).FormulaA1 = "=SUBTOTAL(9,V" + clientStartRow + ":V" + (row - 1) + ")";
+                            ws.Cell(row, 23).FormulaA1 = "=SUBTOTAL(9,W" + clientStartRow + ":W" + (row - 1) + ")";
+                            ws.Cell(row, 24).FormulaA1 = "=SUBTOTAL(9,X" + clientStartRow + ":X" + (row - 1) + ")";
+                            ws.Range(row, 1, row, 38).Style.Font.Bold = true;
+                            ws.Range(row, 1, row, 38).Style.Font.FontSize = 12;
+
+                            ws.Range(row, 1, row, 38).Style.Fill.PatternType = XLFillPatternValues.Solid;
+
+                            ws.Range(row, 1, row, 38).Style.Fill.SetBackgroundColor(XLColor.LightGray);
+                            row++;
+
+                            clientStartRow = row;
+                            //clientEntityStartRow = row;
+                            client = loan.Client.ClientName;
+                            //entity = loan.Entity.EntityName;
                         }
 
-
-                        string cellRef11 = GetExcelColumnName(col++) + row;
-                        if (loan.InterestFee != null)
-                        {
-                            Row detailRow11 = new Row() { RowIndex = row };
-                            Cell detail11 = new Cell() { CellReference = cellRef11, CellValue = new CellValue(loan.InterestFee.Value), DataType = CellValues.Number };
-                            detailRow.Append(detail11);
-                        }
-                        string cellRef12 = GetExcelColumnName(col++) + row;
-                        if (loan.OriginationFee != null)
-                        {
-                            Row detailRow12 = new Row() { RowIndex = row };
-                            Cell detail12 = new Cell() { CellReference = cellRef12, CellValue = new CellValue(loan.OriginationFee.Value), DataType = CellValues.Number };
-                            detailRow.Append(detail12);
-                        }
-                        string cellRef13 = GetExcelColumnName(col++) + row;
-                        if (loan.UnderwritingFee != null)
-                        {
-                            Row detailRow13 = new Row() { RowIndex = row };
-                            Cell detail13 = new Cell() { CellReference = cellRef13, CellValue = new CellValue(loan.UnderwritingFee.Value), DataType = CellValues.Number };
-                            detailRow.Append(detail13);
-                        }
-
-                        string cellRef14 = GetExcelColumnName(col++) + row;
-                        if (loan.TotalFees != null)
-                        {
-                            Row detailRow14 = new Row() { RowIndex = row };
-                            Cell detail14 = new Cell() { CellReference = cellRef14, CellValue = new CellValue(loan.TotalFees.Value), DataType = CellValues.Number };
-                            detailRow.Append(detail14);
-                        }
-                        //string cellRef15 = GetExcelColumnName(col++) + row;
-                        //Row detailRow15 = new Row() { RowIndex = row };
-                        //Cell detail15 = new Cell() { CellReference = cellRef15, CellValue = new CellValue(loan.Investor.InvestorName), DataType = CellValues.String };
-                        //detailRow.Append(detail15);
-
-                        sheetData.InsertAfter(detailRow, lastRow);
+                        ws.Cell(row, 1).Value = loan.Entity.EntityName;
+                        ws.Cell(row, 2).Value = loan.Client.ClientName;
+                        ws.Cell(row, 3).Value = loan.LoanNumber;
+                        ws.Cell(row, 4).Value = loan.LoanMortgagee;
+                        ws.Cell(row, 5).Value = loan.LoanMortgageAmount;
+                        ws.Cell(row, 6).Value = loan.LoanAdvanceAmount;
+                        ws.Cell(row, 7).Value = loan.InvestorProceeds;
+                        ws.Cell(row, 8).Value = loan.AnnualizedYield;
+                        ws.Cell(row, 9).Value = loan.DaysOutstandingClosed;
+                        ws.Cell(row, 10).Value = loan.InvestorProceedsDate;
+                        ws.Cell(row, 11).Value = loan.InterestFee;
+                        ws.Cell(row, 12).Value = loan.OriginationFee;
+                        ws.Cell(row, 14).Value = loan.UnderwritingFee;
+                        ws.Cell(row, 14).Value = loan.TotalFees;
+                        ws.Cell(row, 15).Value = "";
+                        row++;
 
                     }
-                    sheets.Append(sheet);
-                    workbookPart.Workbook.Save();
 
+                    //Client Total
+                    ws.Cell(row, 1).Value = client;
+
+                    ws.Cell(row, 4).FormulaA1 = "=SUBTOTAL(9,D" + clientStartRow + ":D" + (row - 1) + ")";
+                    ws.Cell(row, 8).FormulaA1 = "=SUBTOTAL(9,H" + clientStartRow + ":H" + (row - 1) + ")";
+                    ws.Cell(row, 9).FormulaA1 = "=SUBTOTAL(9,I" + clientStartRow + ":I" + (row - 1) + ")";
+                    ws.Cell(row, 18).FormulaA1 = "=SUBTOTAL(9,R" + clientStartRow + ":R" + (row - 1) + ")";
+                    ws.Cell(row, 20).FormulaA1 = "=SUBTOTAL(9,T" + clientStartRow + ":T" + (row - 1) + ")";
+                    ws.Cell(row, 21).FormulaA1 = "=SUBTOTAL(9,U" + clientStartRow + ":U" + (row - 1) + ")";
+                    ws.Cell(row, 22).FormulaA1 = "=SUBTOTAL(9,V" + clientStartRow + ":V" + (row - 1) + ")";
+                    ws.Cell(row, 23).FormulaA1 = "=SUBTOTAL(9,W" + clientStartRow + ":W" + (row - 1) + ")";
+                    ws.Cell(row, 24).FormulaA1 = "=SUBTOTAL(9,X" + clientStartRow + ":X" + (row - 1) + ")";
+
+                    ws.Range(row, 1, row, 38).Style.Font.Bold = true;
+                    ws.Range(row, 1, row, 38).Style.Font.FontSize = 12;
+
+                    ws.Range(row, 1, row, 38).Style.Fill.PatternType = XLFillPatternValues.Solid;
+
+                    ws.Range(row, 1, row, 38).Style.Fill.SetBackgroundColor(XLColor.LightGray);
+                    //Grand Total
+                    row++;
+                    ws.Cell(row, 1).Value = "Total";
+                    ws.Cell(row, 4).FormulaA1 = "=SUBTOTAL(9,D" + dataStartRow + ":D" + (row - 1) + ")";
+                    ws.Cell(row, 8).FormulaA1 = "=SUBTOTAL(9,H" + dataStartRow + ":H" + (row - 1) + ")";
+                    ws.Cell(row, 9).FormulaA1 = "=SUBTOTAL(9,I" + dataStartRow + ":I" + (row - 1) + ")";
+                    ws.Cell(row, 18).FormulaA1 = "=SUBTOTAL(9,R" + dataStartRow + ":R" + (row - 1) + ")";
+                    ws.Cell(row, 20).FormulaA1 = "=SUBTOTAL(9,T" + dataStartRow + ":T" + (row - 1) + ")";
+                    ws.Cell(row, 21).FormulaA1 = "=SUBTOTAL(9,U" + dataStartRow + ":U" + (row - 1) + ")";
+                    ws.Cell(row, 22).FormulaA1 = "=SUBTOTAL(9,V" + dataStartRow + ":V" + (row - 1) + ")";
+                    ws.Cell(row, 23).FormulaA1 = "=SUBTOTAL(9,W" + dataStartRow + ":W" + (row - 1) + ")";
+                    ws.Cell(row, 24).FormulaA1 = "=SUBTOTAL(9,X" + dataStartRow + ":X" + (row - 1) + ")";
+
+                    ws.Cell(row, 8).Value = "";
+                    ws.Range(row, 1, row, 38).Style.Font.Bold = true;
+                    ws.Range(row, 1, row, 38).Style.Font.FontSize = 14;
+
+                    ws.Range(row, 1, row, 38).Style.Fill.PatternType = XLFillPatternValues.Solid;
+
+                    ws.Range(row, 1, row, 38).Style.Fill.SetBackgroundColor(XLColor.DarkGray);
+
+                    ws.Range(row, 1, row, 38).Style.Font.SetFontColor(XLColor.White);
+                    ws.Columns("A:P").AdjustToContents();
+                    workbook.SaveAs("C:\\Users\\pdean\\CollectionReport.xlsx");
                 }
-                System.Diagnostics.Process.Start("C:\\Users\\pdean\\CollectionsReport.xlsx");
-                //DataSet report = RunsStoredProc.RunStoredProc("TableFunding_SalesReport", "FromDate", fromDate.ToString(), "ToDate", toDate.ToString(), "", "", "", "", "", "", "", "", "", 0);
-                //ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
-
-                ////tableFunding.Delete();
-                //using (ExcelPackage pck = new ExcelPackage())
-                //{
-                //    ExcelWorksheet ws = pck.Workbook.Worksheets.Add("Sales Report");
-
-                //    ws.Cells["A4"].LoadFromDataTable(report.Tables[0], true);
-                //    ws.Cells["A2"].Value = "Sales Report";
-                //    ws.Cells["A3"].Formula = "=Today()";
-
-                //    ws.Cells["A3"].Style.Numberformat.Format = "yyyy-mm-dd";
-
-                //    ws.Cells["F:G"].Style.Numberformat.Format = "#,##0.00";
-
-                //    ws.Cells["H:H"].Style.Numberformat.Format = "yyyy-mm-dd";
-
-                //    ws.Cells["A2"].Style.Font.Size = 18;
-                //    ws.Cells["A3"].Style.Font.Size = 18;
-
-                //    ws.Cells[4, 1, 4, 38].Style.Font.Size = 14;
-
-
-                //    ws.Cells[4, 1, 4, 38].Style.Fill.PatternType = ExcelFillStyle.Solid;
-
-                //    ws.Cells[4, 1, 4, 38].Style.Fill.BackgroundColor.SetColor(System.Drawing.Color.DarkGray);
-
-                //    ws.Cells[4, 1, 4, 38].Style.Font.Color.SetColor(System.Drawing.Color.White);
-
-
-                //    string client = "";
-                //    string investor = "";
-                //    int clientStartRow = 0;
-                //    int clientInvestorStartRow = 0;
-                //    string rowType = "";
-                //    //double totalOpenMortgageBalance = 0;
-                //    //double totalOpenAdvanceBalance = 0;
-                //    int dataStartRow = 5;
-                //    int dataEndRow = 0;
-                //    for (int row = dataStartRow; row <= 1000; row++)
-                //    {
-                //        if (ws.Cells[row, 1].Value == null)
-                //        {
-                //            break;
-                //        }
-
-                //        if (row == dataStartRow)
-                //        {
-                //            client = ws.Cells[row, 1].Text;
-                //            investor = ws.Cells[row, 3].Text;
-                //            clientStartRow = row;
-                //            clientInvestorStartRow = row;
-                //        }
-
-                //        rowType = ws.Cells[row, 14].Text;
-                //        if (rowType == "Grand Total")
-                //        {
-                //            ws.Cells[row, 4].Value = "";
-                //            ws.Cells[row, 6].Formula = "=SUBTOTAL(9,F" + dataStartRow + ":F" + (row - 1) + ")";
-                //            ws.Cells[row, 7].Formula = "=SUBTOTAL(9,G" + dataStartRow + ":G" + (row - 1) + ")";
-
-                //            ws.Cells[row, 8].Value = "";
-                //            ws.Cells[row, 1, row, 11].Style.Font.Bold = true;
-                //            ws.Cells[row, 1, row, 11].Style.Font.Size = 14;
-
-                //            ws.Cells[row, 1, row, 11].Style.Fill.PatternType = ExcelFillStyle.Solid;
-
-                //            ws.Cells[row, 1, row, 11].Style.Fill.BackgroundColor.SetColor(System.Drawing.Color.DarkGray);
-
-                //            ws.Cells[row, 1, row, 11].Style.Font.Color.SetColor(System.Drawing.Color.White);
-
-                //        }
-
-                //        if (rowType == "Client Total")
-                //        {
-                //            ws.Cells[row, 4].Value = "";
-                //            ws.Cells[row, 6].Formula = "=SUBTOTAL(9,F" + clientStartRow + ":F" + (row - 1) + ")";
-                //            ws.Cells[row, 7].Formula = "=SUBTOTAL(9,G" + clientStartRow + ":G" + (row - 1) + ")";
-
-                //            ws.Cells[row, 8].Value = "";
-                //            ws.Cells[row, 9].Value = "";
-                //            ws.Cells[row, 10].Value = "";
-                //            ws.Cells[row, 11].Value = "";
-                //            ws.Cells[row, 1, row, 11].Style.Font.Bold = true;
-                //            ws.Cells[row, 1, row, 11].Style.Font.Size = 12;
-
-                //            ws.Cells[row, 1, row, 11].Style.Fill.PatternType = ExcelFillStyle.Solid;
-
-                //            ws.Cells[row, 1, row, 11].Style.Fill.BackgroundColor.SetColor(System.Drawing.Color.LightGray);
-                //        }
-
-                //        if (rowType == "Client Investor Total")
-                //        {
-                //            ws.Cells[row, 4].Value = "";
-                //            ws.Cells[row, 6].Formula = "=SUBTOTAL(9,F" + clientInvestorStartRow + ":F" + (row - 1) + ")";
-                //            ws.Cells[row, 7].Formula = "=SUBTOTAL(9,G" + clientInvestorStartRow + ":G" + (row - 1) + ")";
-
-                //            ws.Cells[row, 8].Value = "";
-                //            ws.Cells[row, 9].Value = "";
-                //            ws.Cells[row, 10].Value = "";
-                //            ws.Cells[row, 11].Value = "";
-                //            ws.Cells[row, 1, row, 11].Style.Font.Bold = true;
-                //            ws.Cells[row, 1, row, 11].Style.Font.Size = 13;
-
-                //            ws.Cells[row, 1, row, 11].Style.Fill.PatternType = ExcelFillStyle.Solid;
-
-                //            ws.Cells[row, 1, row, 11].Style.Fill.BackgroundColor.SetColor(System.Drawing.Color.Gray);
-                //        }
-                //        if (rowType == "Detail")
-                //        {
-
-
-                //        }
-                //        if (ws.Cells[row, 1].Text != client && rowType == "Detail")
-                //        {
-                //            investor = "";
-                //            client = ws.Cells[row, 1].Text;
-                //            clientStartRow = row;
-                //        }
-                //        if (ws.Cells[row, 3].Text != investor && rowType == "Detail")
-                //        {
-                //            investor = ws.Cells[row, 3].Text;
-                //            clientInvestorStartRow = row;
-                //        }
-
-                //        dataEndRow = row;
-                //    }
-
-                //    ExcelRange dataRange = ws.Cells[dataStartRow - 1, 1, dataEndRow, 10];
-                //    dataRange.AutoFilter = true;
-
-                //    ws.Cells["A:P"].AutoFitColumns();
-                //    ws.Column(6).Width = 20;
-                //    ws.Column(7).Width = 20;
-
-                //    CommonOpenFileDialog dialog = new CommonOpenFileDialog();
-                //    dialog.InitialDirectory = "C:\\Users";
-                //    dialog.IsFolderPicker = true;
-
-                //    string fileName;
-
-                //    fileName = "";
-
-                //    if (dialog.ShowDialog() == CommonFileDialogResult.Ok)
-                //    {
-                //        fileName = dialog.FileName + "\\" + "SalesReport.xlsx";
-
-                //    }
-
-
-
-                //    //System.IO.FileInfo tableFunding = new System.IO.FileInfo(MyVariables.excelReportFilePath + "SalesReport.xlsx");
-
-                //    System.IO.FileInfo tableFunding = new System.IO.FileInfo(fileName);
-
-
-                //    tableFunding.Delete();
-
-                //    pck.SaveAs(tableFunding);
-                //    System.Diagnostics.Process.Start(fileName);
-                //}
             }
             catch (Exception ex)
             {
                 //ErrorLabel.Content = ex.Message;
                 //ErrorLabel.Foreground = new SolidColorBrush(Colors.Red);
             }
+            System.Diagnostics.Process.Start("C:\\Users\\pdean\\CollectionReport.xlsx");
             return Json("");
         }
         [HttpPost]
@@ -2345,164 +2184,203 @@ namespace RAI_MVC.Controllers
                 //ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
 
                 ////tableFunding.Delete();
-                //using (ExcelPackage pck = new ExcelPackage())
-                //{
-                //    ExcelWorksheet ws = pck.Workbook.Worksheets.Add("Sales Report");
+                using (var workbook = new XLWorkbook())
+                {
+                    //    ExcelWorksheet ws = pck.Workbook.Worksheets.Add("Aging Report");
+                    var ws = workbook.Worksheets.Add("Sales Report");
 
-                //    ws.Cells["A4"].LoadFromDataTable(report.Tables[0], true);
-                //    ws.Cells["A2"].Value = "Sales Report";
-                //    ws.Cells["A3"].Formula = "=Today()";
+                    //ws.Cells["A4"].LoadFromDataTable(report.Tables[0], true);
+                    ws.Cell("A2").Value = "Sales Report";
 
-                //    ws.Cells["A3"].Style.Numberformat.Format = "yyyy-mm-dd";
+                    ws.Cell("A3").FormulaA1 = "=Today()";
 
-                //    ws.Cells["F:G"].Style.Numberformat.Format = "#,##0.00";
+                    ws.Cell("A3").Style.NumberFormat.Format = "yyyy-mm-dd";
+                    ws.Cell("A2").Style.Font.FontSize = 18;
+                    ws.Cell("A3").Style.Font.FontSize = 18;
+                    ws.Cell("F:G").Style.NumberFormat.Format = "#,##0.00";
 
-                //    ws.Cells["H:H"].Style.Numberformat.Format = "yyyy-mm-dd";
+                    ws.Cell("H:H").Style.NumberFormat.Format = "yyyy-mm-dd";
 
-                //    ws.Cells["A2"].Style.Font.Size = 18;
-                //    ws.Cells["A3"].Style.Font.Size = 18;
+                    ws.Cell("A2").Style.Font.FontSize = 18;
+                    ws.Cell("A3").Style.Font.FontSize = 18;
 
-                //    ws.Cells[4, 1, 4, 38].Style.Font.Size = 14;
-
-
-                //    ws.Cells[4, 1, 4, 38].Style.Fill.PatternType = ExcelFillStyle.Solid;
-
-                //    ws.Cells[4, 1, 4, 38].Style.Fill.BackgroundColor.SetColor(System.Drawing.Color.DarkGray);
-
-                //    ws.Cells[4, 1, 4, 38].Style.Font.Color.SetColor(System.Drawing.Color.White);
+                    ws.Range(4, 1, 4, 38).Style.Font.FontSize = 14;
 
 
-                //    string client = "";
-                //    string investor = "";
-                //    int clientStartRow = 0;
-                //    int clientInvestorStartRow = 0;
-                //    string rowType = "";
-                //    //double totalOpenMortgageBalance = 0;
-                //    //double totalOpenAdvanceBalance = 0;
-                //    int dataStartRow = 5;
-                //    int dataEndRow = 0;
-                //    for (int row = dataStartRow; row <= 1000; row++)
-                //    {
-                //        if (ws.Cells[row, 1].Value == null)
-                //        {
-                //            break;
-                //        }
+                    ws.Range(4, 1, 4, 38).Style.Fill.PatternType = XLFillPatternValues.Solid;
 
-                //        if (row == dataStartRow)
-                //        {
-                //            client = ws.Cells[row, 1].Text;
-                //            investor = ws.Cells[row, 3].Text;
-                //            clientStartRow = row;
-                //            clientInvestorStartRow = row;
-                //        }
+                    ws.Range(4, 1, 4, 38).Style.Fill.SetBackgroundColor(XLColor.DarkGray);
 
-                //        rowType = ws.Cells[row, 14].Text;
-                //        if (rowType == "Grand Total")
-                //        {
-                //            ws.Cells[row, 4].Value = "";
-                //            ws.Cells[row, 6].Formula = "=SUBTOTAL(9,F" + dataStartRow + ":F" + (row - 1) + ")";
-                //            ws.Cells[row, 7].Formula = "=SUBTOTAL(9,G" + dataStartRow + ":G" + (row - 1) + ")";
+                    ws.Range(4, 1, 4, 38).Style.Font.SetFontColor(XLColor.White);
+                    ws.Cell("A4").Value = "ClientName";
+                    ws.Cell("B4").Value = "Entity";
+                    ws.Cell("C4").Value = "Investor";
+                    ws.Cell("D4").Value = "LoanNumber";
+                    ws.Cell("E4").Value = "Customer Name";
+                    ws.Cell("F4").Value = "Gross Amount";
+                    ws.Cell("G4").Value = "Advance";
+                    ws.Cell("H4").Value = "State";
+                    ws.Cell("I4").Value = "LoanDwellingType";
+                    ws.Cell("J4").Value = "DateDepositedInEscrow";
+                    ws.Cell("K4").Value = "LoanType";
+                    ws.Cell("L4").Value = "WeekToDate";
+                    ws.Cell("M4").Value = "MonthToDate";
+                    ws.Cell("N4").Value = "RowType";
+                    ws.Cell("O4").Value = "SortOrder";
+                    ws.Cell("P4").Value = "SortField";
+                
+                    string client = "";
+                    string investor = "";
+                    int clientStartRow = 0;
+                    int clientInvestorStartRow = 0;
+                    string rowType = "";
+                    //double totalOpenMortgageBalance = 0;
+                    //double totalOpenAdvanceBalance = 0;
+                    int row = 5;
+                    int dataEndRow = 0;
+                    foreach (var loan in rptData)
+                    {
+                        ws.Cell(row, 1).Value = loan.Client.ClientName;
+                        ws.Cell("B4").Value = loan.Entity.EntityName;
+                        ws.Cell("C4").Value = loan.Investor.InvestorName;
+                        ws.Cell("D4").Value = loan.LoanNumber;
+                        ws.Cell("E4").Value = loan.LoanMortgagee;
+                        ws.Cell("F4").Value = loan.LoanMortgageAmount;
+                        ws.Cell("G4").Value = loan.OpenAdvanceBalance;
+                        ws.Cell("H4").Value = loan.State.State1;
+                        ws.Cell("I4").Value = loan.DwellingType.DwellingType1;
+                        ws.Cell("J4").Value = loan.DateDepositedInEscrow;
+                        ws.Cell("K4").Value = loan.LoanType;
+                        ws.Cell("L4").Value = "";
+                        ws.Cell("M4").Value = "";
+                        ws.Cell("N4").Value = "";
+                        ws.Cell("O4").Value = "";
+                        ws.Cell("P4").Value = "";
+                        row++;
+                        //        if (ws.Cell(row, 1)Value == null)
+                        //        {
+                        //            break;
+                        //        }
 
-                //            ws.Cells[row, 8].Value = "";
-                //            ws.Cells[row, 1, row, 11].Style.Font.Bold = true;
-                //            ws.Cells[row, 1, row, 11].Style.Font.Size = 14;
+                        //        if (row == dataStartRow)
+                        //        {
+                        //            client = ws.Cell(row, 1].Text;
+                        //            investor = ws.Cell(row, 3].Text;
+                        //            clientStartRow = row;
+                        //            clientInvestorStartRow = row;
+                        //        }
 
-                //            ws.Cells[row, 1, row, 11].Style.Fill.PatternType = ExcelFillStyle.Solid;
+                        //        rowType = ws.Cell(row, 14].Text;
+                        //        if (rowType == "Grand Total")
+                        //        {
+                        //            ws.Cell(row, 4)Value = "";
+                        //            ws.Cell(row, 6].Formula = "=SUBTOTAL(9,F" + dataStartRow + ":F" + (row - 1) + ")";
+                        //            ws.Cell(row, 7].Formula = "=SUBTOTAL(9,G" + dataStartRow + ":G" + (row - 1) + ")";
 
-                //            ws.Cells[row, 1, row, 11].Style.Fill.BackgroundColor.SetColor(System.Drawing.Color.DarkGray);
+                        //            ws.Cell(row, 8)Value = "";
+                        //            ws.Cell(row, 1, row, 11].Style.Font.Bold = true;
+                        //            ws.Cell(row, 1, row, 11].Style.Font.FontSize = 14;
 
-                //            ws.Cells[row, 1, row, 11].Style.Font.Color.SetColor(System.Drawing.Color.White);
+                        //            ws.Cell(row, 1, row, 11].Style.Fill.PatternType = XLFillPatternValues.Solid;
 
-                //        }
+                        //            ws.Cell(row, 1, row, 11].Style.Fill.BackgroundColor.SetColor(System.Drawing.Color.DarkGray);
 
-                //        if (rowType == "Client Total")
-                //        {
-                //            ws.Cells[row, 4].Value = "";
-                //            ws.Cells[row, 6].Formula = "=SUBTOTAL(9,F" + clientStartRow + ":F" + (row - 1) + ")";
-                //            ws.Cells[row, 7].Formula = "=SUBTOTAL(9,G" + clientStartRow + ":G" + (row - 1) + ")";
+                        //            ws.Cell(row, 1, row, 11].Style.Font.Color.SetColor(System.Drawing.Color.White);
 
-                //            ws.Cells[row, 8].Value = "";
-                //            ws.Cells[row, 9].Value = "";
-                //            ws.Cells[row, 10].Value = "";
-                //            ws.Cells[row, 11].Value = "";
-                //            ws.Cells[row, 1, row, 11].Style.Font.Bold = true;
-                //            ws.Cells[row, 1, row, 11].Style.Font.Size = 12;
+                        //        }
 
-                //            ws.Cells[row, 1, row, 11].Style.Fill.PatternType = ExcelFillStyle.Solid;
+                        //        if (rowType == "Client Total")
+                        //        {
+                        //            ws.Cell(row, 4)Value = "";
+                        //            ws.Cell(row, 6].Formula = "=SUBTOTAL(9,F" + clientStartRow + ":F" + (row - 1) + ")";
+                        //            ws.Cell(row, 7].Formula = "=SUBTOTAL(9,G" + clientStartRow + ":G" + (row - 1) + ")";
 
-                //            ws.Cells[row, 1, row, 11].Style.Fill.BackgroundColor.SetColor(System.Drawing.Color.LightGray);
-                //        }
+                        //            ws.Cell(row, 8)Value = "";
+                        //            ws.Cell(row, 9)Value = "";
+                        //            ws.Cell(row, 10)Value = "";
+                        //            ws.Cell(row, 11)Value = "";
+                        //            ws.Cell(row, 1, row, 11].Style.Font.Bold = true;
+                        //            ws.Cell(row, 1, row, 11].Style.Font.FontSize = 12;
 
-                //        if (rowType == "Client Investor Total")
-                //        {
-                //            ws.Cells[row, 4].Value = "";
-                //            ws.Cells[row, 6].Formula = "=SUBTOTAL(9,F" + clientInvestorStartRow + ":F" + (row - 1) + ")";
-                //            ws.Cells[row, 7].Formula = "=SUBTOTAL(9,G" + clientInvestorStartRow + ":G" + (row - 1) + ")";
+                        //            ws.Cell(row, 1, row, 11].Style.Fill.PatternType = XLFillPatternValues.Solid;
 
-                //            ws.Cells[row, 8].Value = "";
-                //            ws.Cells[row, 9].Value = "";
-                //            ws.Cells[row, 10].Value = "";
-                //            ws.Cells[row, 11].Value = "";
-                //            ws.Cells[row, 1, row, 11].Style.Font.Bold = true;
-                //            ws.Cells[row, 1, row, 11].Style.Font.Size = 13;
+                        //            ws.Cell(row, 1, row, 11].Style.Fill.BackgroundColor.SetColor(System.Drawing.Color.LightGray);
+                        //        }
 
-                //            ws.Cells[row, 1, row, 11].Style.Fill.PatternType = ExcelFillStyle.Solid;
+                        //        if (rowType == "Client Investor Total")
+                        //        {
+                        //            ws.Cell(row, 4)Value = "";
+                        //            ws.Cell(row, 6].Formula = "=SUBTOTAL(9,F" + clientInvestorStartRow + ":F" + (row - 1) + ")";
+                        //            ws.Cell(row, 7].Formula = "=SUBTOTAL(9,G" + clientInvestorStartRow + ":G" + (row - 1) + ")";
 
-                //            ws.Cells[row, 1, row, 11].Style.Fill.BackgroundColor.SetColor(System.Drawing.Color.Gray);
-                //        }
-                //        if (rowType == "Detail")
-                //        {
+                        //            ws.Cell(row, 8)Value = "";
+                        //            ws.Cell(row, 9)Value = "";
+                        //            ws.Cell(row, 10)Value = "";
+                        //            ws.Cell(row, 11)Value = "";
+                        //            ws.Cell(row, 1, row, 11].Style.Font.Bold = true;
+                        //            ws.Cell(row, 1, row, 11].Style.Font.FontSize = 13;
 
+                        //            ws.Cell(row, 1, row, 11].Style.Fill.PatternType = XLFillPatternValues.Solid;
 
-                //        }
-                //        if (ws.Cells[row, 1].Text != client && rowType == "Detail")
-                //        {
-                //            investor = "";
-                //            client = ws.Cells[row, 1].Text;
-                //            clientStartRow = row;
-                //        }
-                //        if (ws.Cells[row, 3].Text != investor && rowType == "Detail")
-                //        {
-                //            investor = ws.Cells[row, 3].Text;
-                //            clientInvestorStartRow = row;
-                //        }
-
-                //        dataEndRow = row;
-                //    }
-
-                //    ExcelRange dataRange = ws.Cells[dataStartRow - 1, 1, dataEndRow, 10];
-                //    dataRange.AutoFilter = true;
-
-                //    ws.Cells["A:P"].AutoFitColumns();
-                //    ws.Column(6).Width = 20;
-                //    ws.Column(7).Width = 20;
-
-                //    CommonOpenFileDialog dialog = new CommonOpenFileDialog();
-                //    dialog.InitialDirectory = "C:\\Users";
-                //    dialog.IsFolderPicker = true;
-
-                //    string fileName;
-
-                //    fileName = "";
-
-                //    if (dialog.ShowDialog() == CommonFileDialogResult.Ok)
-                //    {
-                //        fileName = dialog.FileName + "\\" + "SalesReport.xlsx";
-
-                //    }
-
-
-
-                //    //System.IO.FileInfo tableFunding = new System.IO.FileInfo(MyVariables.excelReportFilePath + "SalesReport.xlsx");
-
-                //    System.IO.FileInfo tableFunding = new System.IO.FileInfo(fileName);
+                        //            ws.Cell(row, 1, row, 11].Style.Fill.BackgroundColor.SetColor(System.Drawing.Color.Gray);
+                        //        }
+                        //        if (rowType == "Detail")
+                        //        {
 
 
-                //    tableFunding.Delete();
+                        //        }
+                        //        if (ws.Cell(row, 1].Text != client && rowType == "Detail")
+                        //        {
+                        //            investor = "";
+                        //            client = ws.Cell(row, 1].Text;
+                        //            clientStartRow = row;
+                        //        }
+                        //        if (ws.Cell(row, 3].Text != investor && rowType == "Detail")
+                        //        {
+                        //            investor = ws.Cell(row, 3].Text;
+                        //            clientInvestorStartRow = row;
+                        //        }
 
-                //    pck.SaveAs(tableFunding);
-                //    System.Diagnostics.Process.Start(fileName);
-                //}
+                        //        dataEndRow = row;
+                        //    }
+
+                        //    ExcelRange dataRange = ws.Cell(dataStartRow - 1, 1, dataEndRow, 10];
+                        //    dataRange.AutoFilter = true;
+
+                        //    ws.Cell("A:P"].AutoFitColumns();
+                        //    ws.Column(6).Width = 20;
+                        //    ws.Column(7).Width = 20;
+
+                        //    CommonOpenFileDialog dialog = new CommonOpenFileDialog();
+                        //    dialog.InitialDirectory = "C:\\Users";
+                        //    dialog.IsFolderPicker = true;
+
+                        //    string fileName;
+
+                        //    fileName = "";
+
+                        //    if (dialog.ShowDialog() == CommonFileDialogResult.Ok)
+                        //    {
+                        //        fileName = dialog.FileName + "\\" + "SalesReport.xlsx";
+
+                        //    }
+
+
+
+                        //    //System.IO.FileInfo tableFunding = new System.IO.FileInfo(MyVariables.excelReportFilePath + "SalesReport.xlsx");
+
+                        //    System.IO.FileInfo tableFunding = new System.IO.FileInfo(fileName);
+
+
+                        //    tableFunding.Delete();
+
+                        //    pck.SaveAs(tableFunding);
+                        //    System.Diagnostics.Process.Start(fileName);
+                    }
+
+                    ws.Columns("A:P").AdjustToContents();
+                workbook.SaveAs("C:\\Users\\pdean\\SalesReport.xlsx");
+            }
             }
             catch (Exception ex)
             {

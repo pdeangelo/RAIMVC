@@ -331,6 +331,41 @@ namespace RAI_MVC.Models
                        CustSvcInterestDiscount +  CustSvcOriginationDiscount + CustSvcUnderwritingDiscount);
             }
         }
+        [DatabaseGenerated(DatabaseGeneratedOption.Computed)]
+        public Double WireFee
+        {
+            get
+            {
+                return (25);
+            }
+        }
+        [DatabaseGenerated(DatabaseGeneratedOption.Computed)]
+        public Double AdvanceWithWireFee
+        {
+            get
+            {
+                return LoanAdvanceAmount.Value - WireFee;
+                
+            }
+        }
+        [DatabaseGenerated(DatabaseGeneratedOption.Computed)]
+        public Double GreaterofMinandCouponInterest
+        {
+            get
+            {
+                return MinimumInterest.Value > LoanInterestRate.Value ? MinimumInterest.Value : LoanInterestRate.Value;
+
+            }
+        }
+        [DatabaseGenerated(DatabaseGeneratedOption.Computed)]
+        public Double AppraisalPcnt
+        {
+            get
+            {
+                return LoanUWAppraisalAmount == null || LoanUWAppraisalAmount.Value == 0  ? 0 : LoanMortgageAmount.Value / LoanUWAppraisalAmount.Value;
+
+            }
+        }
 
         //End Computed Fields
         public virtual LoanStatus LoanStatus { get; set; }

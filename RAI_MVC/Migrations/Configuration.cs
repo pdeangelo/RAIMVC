@@ -142,6 +142,23 @@
                    NoInterest = false
                }
             );
+            context.Client.AddOrUpdate(
+                r => r.ClientID,
+               new Client()
+               {
+                   ClientName = "Client 2",
+                   AdvanceRate = .85,
+                   MinimumInterest = 0,
+                   ClientPrimeRate = .0825,
+                   ClientPrimeRateSpread = .04,
+                   OriginationDiscount = .0025,
+                   OriginationDiscount2 = .0025,
+                   OriginationDiscountNumDays = 30,
+                   OriginationDiscountNumDays2 = 15,
+                   InterestBasedOnAdvance = true,
+                   NoInterest = false
+               }
+            );
 
             context.Loans.AddOrUpdate(
                 r => r.LoanID,
@@ -158,10 +175,74 @@
                     LoanPropertyAddress = "123 Main St, New York, NY 12345",
                     LoanAdvanceRate = .85,
                     LoanMortgageAmount = 100000,
-                    LoanMortgagee = "John Doe"
+                    LoanUWAppraisalAmount = 200000,
+                    LoanMortgagee = "John Doe",
+                    LoanInterestRate = .05,
+                    DateDepositedInEscrow = new DateTime(2023, 1, 1),
+                    BaileeLetterDate = new DateTime(2023, 1, 1),
+                    InvestorProceedsDate = new DateTime(2023, 2, 1),
+                    InvestorProceeds = 80000,
+                    ClosingDate = new DateTime(2023, 2, 1),
+                    MinimumInterest = .1,
+                    OriginationDiscount = 1,
+                    OriginationDiscount2 = 2,
+                    OriginationDiscountNumDays = 30,
+                    OriginationDiscountNumDays2 = 15,
+                    InterestBasedOnAdvance = true,
+                    OriginationBasedOnAdvance = false,
+                    NoInterest = false,
+                    InterestFee = 1000,
+                    OriginationFee = 100,
+                    UnderwritingFee = 500,
+                    CustSvcUnderwritingDiscount = 0,
+                    CustSvcInterestDiscount = 0,
+                    CustSvcOriginationDiscount = 0,
+                    ClientPrimeRate = .04,
+                    ClientPrimeRateSpread = .05
                 }
                 );
 
+            context.Loans.AddOrUpdate(
+                r => r.LoanID,
+                new Loan()
+                {
+                    ClientID = 2,
+                    LoanStatusID = 1,
+                    DwellingTypeID = 1,
+                    EntityID = 1,
+                    StateID = 1,
+                    InvestorID = 1,
+                    LoanTypeID = 1,
+                    LoanNumber = "56789",
+                    LoanPropertyAddress = "123 Main St, New York, NY 12345",
+                    LoanAdvanceRate = .85,
+                    LoanMortgageAmount = 100000,
+                    LoanUWAppraisalAmount = 200000,
+                    LoanMortgagee = "John Doe",
+                    LoanInterestRate = .05,
+                    DateDepositedInEscrow = new DateTime(2023, 1, 1),
+                    BaileeLetterDate = new DateTime(2023, 1, 1),
+                    InvestorProceedsDate = new DateTime(2023, 2, 1),
+                    InvestorProceeds = 80000,
+                    ClosingDate = new DateTime(2023, 2, 1),
+                    MinimumInterest = .1,
+                    OriginationDiscount = 1,
+                    OriginationDiscount2 = 2,
+                    OriginationDiscountNumDays = 30,
+                    OriginationDiscountNumDays2 = 15,
+                    InterestBasedOnAdvance = true,
+                    OriginationBasedOnAdvance = false,
+                    NoInterest = false,
+                    InterestFee = 1000,
+                    OriginationFee = 100,
+                    UnderwritingFee = 500,
+                    CustSvcUnderwritingDiscount = 0,
+                    CustSvcInterestDiscount = 0,
+                    CustSvcOriginationDiscount = 0,
+                    ClientPrimeRate = .04,
+                    ClientPrimeRateSpread = .05
+                }
+                );
 
 
 
