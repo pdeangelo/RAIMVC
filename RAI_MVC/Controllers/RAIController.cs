@@ -1909,21 +1909,19 @@ namespace RAI_MVC.Controllers
                         {
                             ws.Cell(row, 1).Value = client;
 
-                            ws.Cell(row, 4).FormulaA1 = "=SUBTOTAL(9,D" + clientStartRow + ":D" + (row - 1) + ")";
-                            ws.Cell(row, 8).FormulaA1 = "=SUBTOTAL(9,H" + clientStartRow + ":H" + (row - 1) + ")";
-                            ws.Cell(row, 9).FormulaA1 = "=SUBTOTAL(9,I" + clientStartRow + ":I" + (row - 1) + ")";
-                            ws.Cell(row, 18).FormulaA1 = "=SUBTOTAL(9,R" + clientStartRow + ":R" + (row - 1) + ")";
-                            ws.Cell(row, 20).FormulaA1 = "=SUBTOTAL(9,T" + clientStartRow + ":T" + (row - 1) + ")";
-                            ws.Cell(row, 21).FormulaA1 = "=SUBTOTAL(9,U" + clientStartRow + ":U" + (row - 1) + ")";
-                            ws.Cell(row, 22).FormulaA1 = "=SUBTOTAL(9,V" + clientStartRow + ":V" + (row - 1) + ")";
-                            ws.Cell(row, 23).FormulaA1 = "=SUBTOTAL(9,W" + clientStartRow + ":W" + (row - 1) + ")";
-                            ws.Cell(row, 24).FormulaA1 = "=SUBTOTAL(9,X" + clientStartRow + ":X" + (row - 1) + ")";
-                            ws.Range(row, 1, row, 38).Style.Font.Bold = true;
-                            ws.Range(row, 1, row, 38).Style.Font.FontSize = 12;
+                            ws.Cell(row, 5).FormulaA1 = "=SUBTOTAL(9,E" + clientStartRow + ":E" + (row - 1) + ")";
+                            ws.Cell(row, 6).FormulaA1 = "=SUBTOTAL(9,F" + clientStartRow + ":F" + (row - 1) + ")";
+                            ws.Cell(row, 7).FormulaA1 = "=SUBTOTAL(9,G" + clientStartRow + ":G" + (row - 1) + ")";
+                            ws.Cell(row, 11).FormulaA1 = "=SUBTOTAL(9,K" + clientStartRow + ":K" + (row - 1) + ")";
+                            ws.Cell(row, 12).FormulaA1 = "=SUBTOTAL(9,L" + clientStartRow + ":L" + (row - 1) + ")";
+                            ws.Cell(row, 13).FormulaA1 = "=SUBTOTAL(9,M" + clientStartRow + ":M" + (row - 1) + ")";
+                            ws.Cell(row, 14).FormulaA1 = "=SUBTOTAL(9,N" + clientStartRow + ":N" + (row - 1) + ")";
+                            ws.Range(row, 1, row, 15).Style.Font.Bold = true;
+                            ws.Range(row, 1, row, 15).Style.Font.FontSize = 12;
 
-                            ws.Range(row, 1, row, 38).Style.Fill.PatternType = XLFillPatternValues.Solid;
+                            ws.Range(row, 1, row, 15).Style.Fill.PatternType = XLFillPatternValues.Solid;
 
-                            ws.Range(row, 1, row, 38).Style.Fill.SetBackgroundColor(XLColor.LightGray);
+                            ws.Range(row, 1, row, 15).Style.Fill.SetBackgroundColor(XLColor.LightGray);
                             row++;
 
                             clientStartRow = row;
@@ -1944,7 +1942,7 @@ namespace RAI_MVC.Controllers
                         ws.Cell(row, 10).Value = loan.InvestorProceedsDate;
                         ws.Cell(row, 11).Value = loan.InterestFee;
                         ws.Cell(row, 12).Value = loan.OriginationFee;
-                        ws.Cell(row, 14).Value = loan.UnderwritingFee;
+                        ws.Cell(row, 13).Value = loan.UnderwritingFee;
                         ws.Cell(row, 14).Value = loan.TotalFees;
                         ws.Cell(row, 15).Value = "";
                         row++;
@@ -1954,44 +1952,40 @@ namespace RAI_MVC.Controllers
                     //Client Total
                     ws.Cell(row, 1).Value = client;
 
-                    ws.Cell(row, 4).FormulaA1 = "=SUBTOTAL(9,D" + clientStartRow + ":D" + (row - 1) + ")";
-                    ws.Cell(row, 8).FormulaA1 = "=SUBTOTAL(9,H" + clientStartRow + ":H" + (row - 1) + ")";
-                    ws.Cell(row, 9).FormulaA1 = "=SUBTOTAL(9,I" + clientStartRow + ":I" + (row - 1) + ")";
-                    ws.Cell(row, 18).FormulaA1 = "=SUBTOTAL(9,R" + clientStartRow + ":R" + (row - 1) + ")";
-                    ws.Cell(row, 20).FormulaA1 = "=SUBTOTAL(9,T" + clientStartRow + ":T" + (row - 1) + ")";
-                    ws.Cell(row, 21).FormulaA1 = "=SUBTOTAL(9,U" + clientStartRow + ":U" + (row - 1) + ")";
-                    ws.Cell(row, 22).FormulaA1 = "=SUBTOTAL(9,V" + clientStartRow + ":V" + (row - 1) + ")";
-                    ws.Cell(row, 23).FormulaA1 = "=SUBTOTAL(9,W" + clientStartRow + ":W" + (row - 1) + ")";
-                    ws.Cell(row, 24).FormulaA1 = "=SUBTOTAL(9,X" + clientStartRow + ":X" + (row - 1) + ")";
+                    ws.Cell(row, 5).FormulaA1 = "=SUBTOTAL(9,E" + clientStartRow + ":E" + (row - 1) + ")";
+                    ws.Cell(row, 6).FormulaA1 = "=SUBTOTAL(9,F" + clientStartRow + ":F" + (row - 1) + ")";
+                    ws.Cell(row, 7).FormulaA1 = "=SUBTOTAL(9,G" + clientStartRow + ":G" + (row - 1) + ")";
+                    ws.Cell(row, 11).FormulaA1 = "=SUBTOTAL(9,K" + clientStartRow + ":K" + (row - 1) + ")";
+                    ws.Cell(row, 12).FormulaA1 = "=SUBTOTAL(9,L" + clientStartRow + ":L" + (row - 1) + ")";
+                    ws.Cell(row, 13).FormulaA1 = "=SUBTOTAL(9,M" + clientStartRow + ":M" + (row - 1) + ")";
+                    ws.Cell(row, 14).FormulaA1 = "=SUBTOTAL(9,N" + clientStartRow + ":N" + (row - 1) + ")";
 
-                    ws.Range(row, 1, row, 38).Style.Font.Bold = true;
-                    ws.Range(row, 1, row, 38).Style.Font.FontSize = 12;
+                    ws.Range(row, 1, row, 15).Style.Font.Bold = true;
+                    ws.Range(row, 1, row, 15).Style.Font.FontSize = 12;
 
-                    ws.Range(row, 1, row, 38).Style.Fill.PatternType = XLFillPatternValues.Solid;
+                    ws.Range(row, 1, row, 15).Style.Fill.PatternType = XLFillPatternValues.Solid;
 
-                    ws.Range(row, 1, row, 38).Style.Fill.SetBackgroundColor(XLColor.LightGray);
+                    ws.Range(row, 1, row, 15).Style.Fill.SetBackgroundColor(XLColor.LightGray);
                     //Grand Total
                     row++;
                     ws.Cell(row, 1).Value = "Total";
-                    ws.Cell(row, 4).FormulaA1 = "=SUBTOTAL(9,D" + dataStartRow + ":D" + (row - 1) + ")";
-                    ws.Cell(row, 8).FormulaA1 = "=SUBTOTAL(9,H" + dataStartRow + ":H" + (row - 1) + ")";
-                    ws.Cell(row, 9).FormulaA1 = "=SUBTOTAL(9,I" + dataStartRow + ":I" + (row - 1) + ")";
-                    ws.Cell(row, 18).FormulaA1 = "=SUBTOTAL(9,R" + dataStartRow + ":R" + (row - 1) + ")";
-                    ws.Cell(row, 20).FormulaA1 = "=SUBTOTAL(9,T" + dataStartRow + ":T" + (row - 1) + ")";
-                    ws.Cell(row, 21).FormulaA1 = "=SUBTOTAL(9,U" + dataStartRow + ":U" + (row - 1) + ")";
-                    ws.Cell(row, 22).FormulaA1 = "=SUBTOTAL(9,V" + dataStartRow + ":V" + (row - 1) + ")";
-                    ws.Cell(row, 23).FormulaA1 = "=SUBTOTAL(9,W" + dataStartRow + ":W" + (row - 1) + ")";
-                    ws.Cell(row, 24).FormulaA1 = "=SUBTOTAL(9,X" + dataStartRow + ":X" + (row - 1) + ")";
+                    ws.Cell(row, 5).FormulaA1 = "=SUBTOTAL(9,E" + dataStartRow + ":E" + (row - 1) + ")";
+                    ws.Cell(row, 6).FormulaA1 = "=SUBTOTAL(9,F" + dataStartRow + ":F" + (row - 1) + ")";
+                    ws.Cell(row, 7).FormulaA1 = "=SUBTOTAL(9,G" + dataStartRow + ":G" + (row - 1) + ")";
+                    ws.Cell(row, 11).FormulaA1 = "=SUBTOTAL(9,K" + dataStartRow + ":K" + (row - 1) + ")";
+                    ws.Cell(row, 12).FormulaA1 = "=SUBTOTAL(9,L" + dataStartRow + ":L" + (row - 1) + ")";
+                    ws.Cell(row, 13).FormulaA1 = "=SUBTOTAL(9,M" + dataStartRow + ":M" + (row - 1) + ")";
+                    ws.Cell(row, 14).FormulaA1 = "=SUBTOTAL(9,N" + dataStartRow + ":N" + (row - 1) + ")";
 
                     ws.Cell(row, 8).Value = "";
-                    ws.Range(row, 1, row, 38).Style.Font.Bold = true;
-                    ws.Range(row, 1, row, 38).Style.Font.FontSize = 14;
+                    ws.Range(row, 1, row, 15).Style.Font.Bold = true;
+                    ws.Range(row, 1, row, 15).Style.Font.FontSize = 14;
 
-                    ws.Range(row, 1, row, 38).Style.Fill.PatternType = XLFillPatternValues.Solid;
+                    ws.Range(row, 1, row, 15).Style.Fill.PatternType = XLFillPatternValues.Solid;
 
-                    ws.Range(row, 1, row, 38).Style.Fill.SetBackgroundColor(XLColor.DarkGray);
+                    ws.Range(row, 1, row, 15).Style.Fill.SetBackgroundColor(XLColor.DarkGray);
 
-                    ws.Range(row, 1, row, 38).Style.Font.SetFontColor(XLColor.White);
+                    ws.Range(row, 1, row, 15).Style.Font.SetFontColor(XLColor.White);
                     ws.Columns("A:P").AdjustToContents();
                     workbook.SaveAs("C:\\Users\\pdean\\CollectionReport.xlsx");
                 }
