@@ -226,6 +226,9 @@
     <Content Include="Views\RAI\TrackingReport.cshtml" />
     <Content Include="Views\RAI\AgingReport.cshtml" />
     <Content Include="Views\RAI\Dashboard.cshtml" />
+    <Content Include="Views\RAI\Entities.cshtml" />
+    <Content Include="Views\RAI\_EntityForm.cshtml" />
+    <Content Include="Views\RAI\EditEntity.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

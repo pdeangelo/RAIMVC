@@ -20,12 +20,14 @@ namespace RAI_MVC.Controllers
         private ClientsRepository _clientsRepository = null;
         private LoanRepository _loanRepository = null;
         private InvestorRepository _investorRepository = null;
+        private EntityRepository _entityRepository = null;
         public RAIController()
         {
             _usersRepository = new UsersRepository();
             _loanRepository = new LoanRepository();
             _clientsRepository = new ClientsRepository();
             _investorRepository = new InvestorRepository();
+            _entityRepository = new EntityRepository();
         }
         public ActionResult Detail(int? id)
         {
@@ -297,7 +299,7 @@ namespace RAI_MVC.Controllers
                 Spire.Doc.Document DocOne = new Spire.Doc.Document();
 
                 //DocOne.LoadFromStream(FileUploadControlBailee.PostedFile.InputStream, FileFormat.Docx);
-                DocOne.LoadFromFile(@"C:\Users\pdean\OneDrive - Focused Financial Systems\Projects\RAIGroup\Letters\Bailee_PML_RAI Funding.docx", FileFormat.Docx);
+                DocOne.LoadFromFile(@"C:\Users\pdean\LetterTemplates\Bailee_Aloha_RAI Funding, LLC.docx", FileFormat.Docx);
                 
                 DateTime today = DateTime.Today;
                 string todayStr;
@@ -312,7 +314,7 @@ namespace RAI_MVC.Controllers
                 string fileName;
                 string todayStrFile = string.Format("{0:yyyy_MM_dd}", today);
 
-                fileName = "C:\\Users\\pdean\\Bailee_" + client.ClientName + "_" + entity.EntityName + "_" + loanNumberList + ".docx";
+                fileName = @"C:\Users\pdean\Reports\\Bailee_" + client.ClientName + "_" + entity.EntityName + "_" + loanNumberList + ".docx";
                 //CommonOpenFileDialog dialog = new CommonOpenFileDialog();
                 //dialog.InitialDirectory = "C:\\Users";
                 //dialog.IsFolderPicker = true;
@@ -592,7 +594,7 @@ namespace RAI_MVC.Controllers
                 //    fileName = dialog.FileName + "\\" + fileName;
 
                 //}
-                fileName = "C:\\Users\\pdean\\Bailee_" + client.ClientName + "_" + entity.EntityName + "_" + loanlist + ".docx";
+                fileName = @"C:\Users\pdean\Reports\\Advance_" + client.ClientName + "_" + entity.EntityName + "_" + loanlist + ".docx";
 
                 document.SaveToFile(fileName, FileFormat.Docx);
 
@@ -945,8 +947,7 @@ namespace RAI_MVC.Controllers
                 string fileName;
                 string todayStrFile = string.Format("{0:yyyy_MM_dd}", today);
 
-                fileName = "Remittance_" + client.ClientName + "_" + entity.EntityName + "_" + todayStrFile + ".docx";
-                //CommonOpenFileDialog dialog = new CommonOpenFileDialog();
+                 //CommonOpenFileDialog dialog = new CommonOpenFileDialog();
                 //dialog.InitialDirectory = "C:\\Users";
                 //dialog.IsFolderPicker = true;
 
@@ -956,6 +957,7 @@ namespace RAI_MVC.Controllers
 
                 //}
 
+                fileName = @"C:\Users\pdean\Reports\\Remittance_" + client.ClientName + "_" + entity.EntityName + "_" + loanlist + ".docx";
 
                 document.SaveToFile(fileName, FileFormat.Docx);
 
@@ -1138,7 +1140,7 @@ namespace RAI_MVC.Controllers
                 //}
 
                 //DocOne.LoadFromFile(releaseFileName, FileFormat.Docx);
-                DocOne.LoadFromFile(@"C:\Users\pdean\OneDrive - Focused Financial Systems\Projects\RAIGroup\Letters\Bailee_PML_RAI Funding.docx", FileFormat.Docx);
+                DocOne.LoadFromFile(@"C:\Users\pdean\LetterTemplates\Release_Northwind Financial_RAI Funding, LLC.docx", FileFormat.Docx);
 
                 DateTime today = DateTime.Today;
                 string todayStr;
@@ -1155,9 +1157,7 @@ namespace RAI_MVC.Controllers
                 string fileName;
                 string todayStrFile = string.Format("{0:yyyy_MM_dd}", today);
 
-                fileName = "Release_" + client.ClientName + "_" + entity.EntityName + "_" + loanNumberList + ".docx";
-
-
+                
                 //CommonOpenFileDialog dialog = new CommonOpenFileDialog();
                 //dialog.InitialDirectory = "C:\\Users";
                 //dialog.IsFolderPicker = true;
@@ -1167,7 +1167,7 @@ namespace RAI_MVC.Controllers
                 //    fileName = dialog.FileName + "\\" + fileName;
 
                 //}
-                fileName = "C:\\Users\\pdean\\Release_" + client.ClientName + "_" + entity.EntityName + "_" + loanlist + ".docx";
+                fileName = @"C:\Users\pdean\Reports\\Release_" + client.ClientName + "_" + entity.EntityName + "_" + loanlist + ".docx";
 
                 DocOne.SaveToFile(fileName, FileFormat.Docx);
 
@@ -1242,6 +1242,50 @@ namespace RAI_MVC.Controllers
             TempData["Message"] = "Investor Successfully Deleted";
             return RedirectToAction("Investors");
         }
+
+
+
+        public ActionResult Entities()
+        {
+            var entities = _entityRepository.GetEntities();
+            return View(entities);
+        }
+        public ActionResult EditEntity(int? id)
+        {
+            if (id == null)
+            {
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+            }
+
+            Entity entity = _entityRepository.GetEntity((int)id);
+            if (entity == null)
+            {
+                return HttpNotFound();
+            }
+            SetupSelectListItems();
+            return View(entity);
+        }
+        [HttpPost]
+        public ActionResult EditEntity(Entity entity)
+        {
+            if (ModelState.IsValid)
+            {
+                _entityRepository.UpdateEntity(entity);
+
+                TempData["Message"] = "Entity Successfully Updated";
+                return RedirectToAction("Entities");
+            }
+
+            return View(entity);
+        }
+        public ActionResult DeleteEntity(int id)
+        {
+            _entityRepository.DeleteEntity(id);
+
+            TempData["Message"] = "Entity Successfully Deleted";
+            return RedirectToAction("Entities");
+        }
+
         public ActionResult Clients()
         {
             var clients = _clientsRepository.GetClients();
@@ -1556,7 +1600,7 @@ namespace RAI_MVC.Controllers
 
 
                     ws.Columns("A:P").AdjustToContents();
-                    workbook.SaveAs("C:\\Users\\pdean\\AgingReport.xlsx");
+                    workbook.SaveAs("C:\\Users\\pdean\\Reports\\AgingReport.xlsx");
                 }
             }
             catch (Exception ex)
@@ -1565,7 +1609,7 @@ namespace RAI_MVC.Controllers
                 //ErrorLabel.Foreground = new SolidColorBrush(Colors.Red);
             }
 
-            System.Diagnostics.Process.Start("C:\\Users\\pdean\\AgingReport.xlsx");
+            System.Diagnostics.Process.Start("C:\\Users\\pdean\\Reports\\AgingReport.xlsx");
             return Json("");
         }
         [HttpPost]
@@ -1799,7 +1843,7 @@ namespace RAI_MVC.Controllers
 
                     ws.Range(row, 1, row, 38).Style.Font.SetFontColor(XLColor.White);
                     ws.Columns("A:AO").AdjustToContents();
-                    workbook.SaveAs("C:\\Users\\pdean\\TrackingReport.xlsx");
+                    workbook.SaveAs("C:\\Users\\pdean\\Reports\\TrackingReport.xlsx");
                 }
 
             }
@@ -1809,7 +1853,7 @@ namespace RAI_MVC.Controllers
                 //ErrorLabel.Foreground = new SolidColorBrush(Colors.Red);
             }
 
-            System.Diagnostics.Process.Start("C:\\Users\\pdean\\TrackingReport.xlsx");
+            System.Diagnostics.Process.Start("C:\\Users\\pdean\\Reports\\TrackingReport.xlsx");
             return Json("");
         }
         [HttpPost]
@@ -1987,7 +2031,7 @@ namespace RAI_MVC.Controllers
 
                     ws.Range(row, 1, row, 15).Style.Font.SetFontColor(XLColor.White);
                     ws.Columns("A:P").AdjustToContents();
-                    workbook.SaveAs("C:\\Users\\pdean\\CollectionReport.xlsx");
+                    workbook.SaveAs("C:\\Users\\pdean\\Reports\\CollectionReport.xlsx");
                 }
             }
             catch (Exception ex)
@@ -1995,7 +2039,7 @@ namespace RAI_MVC.Controllers
                 //ErrorLabel.Content = ex.Message;
                 //ErrorLabel.Foreground = new SolidColorBrush(Colors.Red);
             }
-            System.Diagnostics.Process.Start("C:\\Users\\pdean\\CollectionReport.xlsx");
+            System.Diagnostics.Process.Start("C:\\Users\\pdean\\Reports\\CollectionReport.xlsx");
             return Json("");
         }
         [HttpPost]
@@ -2025,159 +2069,6 @@ namespace RAI_MVC.Controllers
                 //toDate = dtToDate.Value;
                 var rptData = _loanRepository.GetLoans();
 
-                using (SpreadsheetDocument spreadsheetDocument = SpreadsheetDocument.Create("C:\\Users\\pdean\\SalesReport.xlsx", SpreadsheetDocumentType.Workbook))
-                {
-                    WorkbookPart workbookPart = spreadsheetDocument.AddWorkbookPart();
-
-                    workbookPart.Workbook = new Workbook();
-                    WorksheetPart worksheetPart = workbookPart.AddNewPart<WorksheetPart>();
-                    SheetData sheetData = new SheetData();
-                    worksheetPart.Worksheet = new Worksheet(sheetData);
-
-                    Sheets sheets = spreadsheetDocument.WorkbookPart.Workbook.AppendChild<Sheets>(new Sheets());
-                    Sheet sheet = new Sheet()
-                    {
-                        Id = spreadsheetDocument.WorkbookPart.GetIdOfPart(worksheetPart),
-                        SheetId = 1,
-                        Name = "Sheet1"
-                    };
-
-                    #region Headers
-                    Row headerRow = new Row() { RowIndex = 1 };
-                    Cell header = new Cell() { CellReference = "A1", CellValue = new CellValue("ClientName"), DataType = CellValues.String };
-                    headerRow.Append(header);
-
-                    Cell header1 = new Cell() { CellReference = "B1", CellValue = new CellValue("Entity"), DataType = CellValues.String };
-                    headerRow.Append(header1);
-
-                    Cell header2 = new Cell() { CellReference = "C1", CellValue = new CellValue("Investor"), DataType = CellValues.String };
-                    headerRow.Append(header2);
-                    Cell header3 = new Cell() { CellReference = "D1", CellValue = new CellValue("LoanNumber"), DataType = CellValues.String };
-                    headerRow.Append(header3);
-                    Cell header4 = new Cell() { CellReference = "E1", CellValue = new CellValue("Customer Name"), DataType = CellValues.String };
-                    headerRow.Append(header4);
-                    Cell header5 = new Cell() { CellReference = "F1", CellValue = new CellValue("Gross Amount"), DataType = CellValues.String };
-                    headerRow.Append(header5);
-                    Cell header6 = new Cell() { CellReference = "G1", CellValue = new CellValue("Advance"), DataType = CellValues.String };
-                    headerRow.Append(header6);
-                    Cell header7 = new Cell() { CellReference = "H1", CellValue = new CellValue("State"), DataType = CellValues.String };
-                    headerRow.Append(header7);
-                    Cell header8 = new Cell() { CellReference = "I1", CellValue = new CellValue("LoanDwellingType"), DataType = CellValues.String };
-                    headerRow.Append(header8);
-                    Cell header9 = new Cell() { CellReference = "J1", CellValue = new CellValue("DateDepositedInEscrow"), DataType = CellValues.String };
-                    headerRow.Append(header9);
-                    Cell header10 = new Cell() { CellReference = "K1", CellValue = new CellValue("LoanType"), DataType = CellValues.String };
-                    headerRow.Append(header10);
-                    Cell header11 = new Cell() { CellReference = "L1", CellValue = new CellValue("WeekToDate"), DataType = CellValues.String };
-                    headerRow.Append(header11);
-                    Cell header12 = new Cell() { CellReference = "M1", CellValue = new CellValue("MonthToDate"), DataType = CellValues.String };
-                    headerRow.Append(header12);
-                    Cell header13 = new Cell() { CellReference = "N1", CellValue = new CellValue("RowType"), DataType = CellValues.String };
-                    headerRow.Append(header13);
-                    Cell header14 = new Cell() { CellReference = "O1", CellValue = new CellValue("SortOrder"), DataType = CellValues.String };
-                    headerRow.Append(header14);
-                    Cell header15 = new Cell() { CellReference = "P1", CellValue = new CellValue("SortField"), DataType = CellValues.String };
-                    headerRow.Append(header15);
-                    sheetData.Append(headerRow);
-                    #endregion
-
-                    int col = 1;
-                    UInt32Value row = 2;
-                    foreach (var loan in rptData)
-                    {
-                        Row lastRow = sheetData.Elements<Row>().LastOrDefault();
-                        string cellRef = GetExcelColumnName(col++) + row;
-                        Row detailRow = new Row() { RowIndex = row };
-                        Cell detail = new Cell() { CellReference = cellRef, CellValue = new CellValue(loan.Client.ClientName), DataType = CellValues.String };
-                        detailRow.Append(detail);
-
-                        string cellRef2 = GetExcelColumnName(col++) + row;
-                        Row detailRow2 = new Row() { RowIndex = row };
-                        Cell detail2 = new Cell() { CellReference = cellRef2, CellValue = new CellValue(loan.Entity.EntityName), DataType = CellValues.String };
-                        detailRow.Append(detail2);
-
-                        string cellRef3 = GetExcelColumnName(col++) + row;
-                        Row detailRow3 = new Row() { RowIndex = row };
-                        Cell detail3 = new Cell() { CellReference = cellRef3, CellValue = new CellValue(loan.Investor.InvestorName), DataType = CellValues.String };
-                        detailRow.Append(detail3);
-
-
-                        string cellRef4 = GetExcelColumnName(col++) + row;
-                        Row detailRow4 = new Row() { RowIndex = row };
-                        Cell detail4 = new Cell() { CellReference = cellRef4, CellValue = new CellValue(loan.LoanNumber), DataType = CellValues.String };
-                        detailRow.Append(detail4);
-
-                        string cellRef5 = GetExcelColumnName(col++) + row;
-                        Row detailRow5 = new Row() { RowIndex = row };
-                        Cell detail5 = new Cell() { CellReference = cellRef5, CellValue = new CellValue(loan.LoanMortgagee), DataType = CellValues.String };
-                        detailRow.Append(detail5);
-
-                        string cellRef6 = GetExcelColumnName(col++) + row;
-                        Row detailRow6 = new Row() { RowIndex = row };
-                        Cell detail6 = new Cell() { CellReference = cellRef6, CellValue = new CellValue(loan.LoanMortgageAmount.Value), DataType = CellValues.Number };
-                        detailRow.Append(detail6);
-
-                        string cellRef7 = GetExcelColumnName(col++) + row;
-                        Row detailRow7 = new Row() { RowIndex = row };
-                        Cell detail7 = new Cell() { CellReference = cellRef7, CellValue = new CellValue(loan.LoanAdvanceAmount.Value), DataType = CellValues.Number };
-                        detailRow.Append(detail7);
-
-                        string cellRef8 = GetExcelColumnName(col++) + row;
-                        Row detailRow8 = new Row() { RowIndex = row };
-                        Cell detail8 = new Cell() { CellReference = cellRef8, CellValue = new CellValue(loan.State.State1), DataType = CellValues.String };
-                        detailRow.Append(detail8);
-
-                        string cellRef9 = GetExcelColumnName(col++) + row;
-                        Row detailRow9 = new Row() { RowIndex = row };
-                        Cell detail9 = new Cell() { CellReference = cellRef9, CellValue = new CellValue(loan.DwellingType.DwellingType1), DataType = CellValues.String };
-                        detailRow.Append(detail9);
-
-                        string cellRef10 = GetExcelColumnName(col++) + row;
-                        if (loan.DateDepositedInEscrow != null)
-                        {
-                            Row detailRow10 = new Row() { RowIndex = row };
-                            Cell detail10 = new Cell() { CellReference = cellRef10, CellValue = new CellValue(loan.DateDepositedInEscrow.Value), DataType = CellValues.Date };
-                            detailRow.Append(detail10);
-                        }
-                    
-
-                        string cellRef11 = GetExcelColumnName(col++) + row;
-                        Row detailRow11 = new Row() { RowIndex = row };
-                        Cell detail11 = new Cell() { CellReference = cellRef11, CellValue = new CellValue(loan.LoanType.LoanTypeName), DataType = CellValues.String };
-                        detailRow.Append(detail11);
-
-                        //string cellRef12 = GetExcelColumnName(col++) + row;
-                        //Row detailRow12 = new Row() { RowIndex = row };
-                        //Cell detail12 = new Cell() { CellReference = cellRef12, CellValue = new CellValue(loan.Investor.InvestorName), DataType = CellValues.String };
-                        //detailRow.Append(detail12);
-
-                        //string cellRef13 = GetExcelColumnName(col++) + row;
-                        //Row detailRow13 = new Row() { RowIndex = row };
-                        //Cell detail13 = new Cell() { CellReference = cellRef13, CellValue = new CellValue(loan.Investor.InvestorName), DataType = CellValues.String };
-                        //detailRow.Append(detail13);
-
-                        //string cellRef14 = GetExcelColumnName(col++) + row;
-                        //Row detailRow14 = new Row() { RowIndex = row };
-                        //Cell detail14 = new Cell() { CellReference = cellRef14, CellValue = new CellValue(loan.Investor.InvestorName), DataType = CellValues.String };
-                        //detailRow.Append(detail14);
-
-                        //string cellRef15 = GetExcelColumnName(col++) + row;
-                        //Row detailRow15 = new Row() { RowIndex = row };
-                        //Cell detail15 = new Cell() { CellReference = cellRef15, CellValue = new CellValue(loan.Investor.InvestorName), DataType = CellValues.String };
-                        //detailRow.Append(detail15);
-
-                        sheetData.InsertAfter(detailRow, lastRow);
-
-                    }
-                    sheets.Append(sheet);
-                    workbookPart.Workbook.Save();
-
-                }
-                System.Diagnostics.Process.Start("C:\\Users\\pdean\\SalesReport.xlsx");
-                //DataSet report = RunsStoredProc.RunStoredProc("TableFunding_SalesReport", "FromDate", fromDate.ToString(), "ToDate", toDate.ToString(), "", "", "", "", "", "", "", "", "", 0);
-                //ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
-
-                ////tableFunding.Delete();
                 using (var workbook = new XLWorkbook())
                 {
                     //    ExcelWorksheet ws = pck.Workbook.Worksheets.Add("Aging Report");
@@ -2191,21 +2082,21 @@ namespace RAI_MVC.Controllers
                     ws.Cell("A3").Style.NumberFormat.Format = "yyyy-mm-dd";
                     ws.Cell("A2").Style.Font.FontSize = 18;
                     ws.Cell("A3").Style.Font.FontSize = 18;
-                    ws.Cell("F:G").Style.NumberFormat.Format = "#,##0.00";
+                    ws.Range("F5:G200").Style.NumberFormat.Format = "#,##0.00";
 
-                    ws.Cell("H:H").Style.NumberFormat.Format = "yyyy-mm-dd";
+                    ws.Range("H5:H200").Style.NumberFormat.Format = "yyyy-mm-dd";
 
                     ws.Cell("A2").Style.Font.FontSize = 18;
                     ws.Cell("A3").Style.Font.FontSize = 18;
 
-                    ws.Range(4, 1, 4, 38).Style.Font.FontSize = 14;
+                    ws.Range(4, 1, 4, 11).Style.Font.FontSize = 14;
 
 
-                    ws.Range(4, 1, 4, 38).Style.Fill.PatternType = XLFillPatternValues.Solid;
+                    ws.Range(4, 1, 4, 11).Style.Fill.PatternType = XLFillPatternValues.Solid;
 
-                    ws.Range(4, 1, 4, 38).Style.Fill.SetBackgroundColor(XLColor.DarkGray);
+                    ws.Range(4, 1, 4, 11).Style.Fill.SetBackgroundColor(XLColor.DarkGray);
 
-                    ws.Range(4, 1, 4, 38).Style.Font.SetFontColor(XLColor.White);
+                    ws.Range(4, 1, 4, 11).Style.Font.SetFontColor(XLColor.White);
                     ws.Cell("A4").Value = "ClientName";
                     ws.Cell("B4").Value = "Entity";
                     ws.Cell("C4").Value = "Investor";
@@ -2231,156 +2122,94 @@ namespace RAI_MVC.Controllers
                     //double totalOpenMortgageBalance = 0;
                     //double totalOpenAdvanceBalance = 0;
                     int row = 5;
+                    int dataStartRow = 5;
                     int dataEndRow = 0;
                     foreach (var loan in rptData)
                     {
+                        if (row == dataStartRow)
+                        {
+                            client = loan.Client.ClientName;
+                            //entity = loan.Entity.EntityName;
+                            clientStartRow = row;
+                            //clientEntityStartRow = row;
+                        }
+                        if (loan.Client.ClientName != client)
+                        {
+                            ws.Cell(row, 1).Value = client;
+
+                            ws.Cell(row, 6).FormulaA1 = "=SUBTOTAL(9,F" + clientStartRow + ":F" + (row - 1) + ")";
+                            ws.Cell(row, 7).FormulaA1 = "=SUBTOTAL(9,G" + clientStartRow + ":G" + (row - 1) + ")";
+                            ws.Range(row, 1, row, 11).Style.Font.Bold = true;
+                            ws.Range(row, 1, row, 11).Style.Font.FontSize = 12;
+
+                            ws.Range(row, 1, row, 11).Style.Fill.PatternType = XLFillPatternValues.Solid;
+
+                            ws.Range(row, 1, row, 11).Style.Fill.SetBackgroundColor(XLColor.LightGray);
+                            row++;
+
+                            clientStartRow = row;
+                            //clientEntityStartRow = row;
+                            client = loan.Client.ClientName;
+                            //entity = loan.Entity.EntityName;
+                        }
+
                         ws.Cell(row, 1).Value = loan.Client.ClientName;
-                        ws.Cell("B4").Value = loan.Entity.EntityName;
-                        ws.Cell("C4").Value = loan.Investor.InvestorName;
-                        ws.Cell("D4").Value = loan.LoanNumber;
-                        ws.Cell("E4").Value = loan.LoanMortgagee;
-                        ws.Cell("F4").Value = loan.LoanMortgageAmount;
-                        ws.Cell("G4").Value = loan.OpenAdvanceBalance;
-                        ws.Cell("H4").Value = loan.State.State1;
-                        ws.Cell("I4").Value = loan.DwellingType.DwellingType1;
-                        ws.Cell("J4").Value = loan.DateDepositedInEscrow;
-                        ws.Cell("K4").Value = loan.LoanType;
-                        ws.Cell("L4").Value = "";
-                        ws.Cell("M4").Value = "";
-                        ws.Cell("N4").Value = "";
-                        ws.Cell("O4").Value = "";
-                        ws.Cell("P4").Value = "";
+                        ws.Cell(row, 2).Value = loan.Entity.EntityName;
+                        ws.Cell(row, 3).Value = loan.Investor.InvestorName;
+                        ws.Cell(row, 4).Value = loan.LoanNumber;
+                        ws.Cell(row, 5).Value = loan.LoanMortgagee;
+                        ws.Cell(row, 6).Value = loan.LoanMortgageAmount;
+                        ws.Cell(row, 7).Value = loan.OpenAdvanceBalance;
+                        ws.Cell(row, 8).Value = loan.State.State1;
+                        ws.Cell(row, 9).Value = loan.DwellingType.DwellingType1;
+                        ws.Cell(row, 10).Value = loan.DateDepositedInEscrow;
+                        ws.Cell(row, 11).Value = loan.LoanType.LoanTypeName;
+                        ws.Cell(row, 12).Value = "";
+                        ws.Cell(row, 13).Value = "";
+                        ws.Cell(row, 14).Value = "";
+                        ws.Cell(row, 15).Value = "";
+                        ws.Cell(row, 16).Value = "";
                         row++;
-                        //        if (ws.Cell(row, 1)Value == null)
-                        //        {
-                        //            break;
-                        //        }
-
-                        //        if (row == dataStartRow)
-                        //        {
-                        //            client = ws.Cell(row, 1].Text;
-                        //            investor = ws.Cell(row, 3].Text;
-                        //            clientStartRow = row;
-                        //            clientInvestorStartRow = row;
-                        //        }
-
-                        //        rowType = ws.Cell(row, 14].Text;
-                        //        if (rowType == "Grand Total")
-                        //        {
-                        //            ws.Cell(row, 4)Value = "";
-                        //            ws.Cell(row, 6].Formula = "=SUBTOTAL(9,F" + dataStartRow + ":F" + (row - 1) + ")";
-                        //            ws.Cell(row, 7].Formula = "=SUBTOTAL(9,G" + dataStartRow + ":G" + (row - 1) + ")";
-
-                        //            ws.Cell(row, 8)Value = "";
-                        //            ws.Cell(row, 1, row, 11].Style.Font.Bold = true;
-                        //            ws.Cell(row, 1, row, 11].Style.Font.FontSize = 14;
-
-                        //            ws.Cell(row, 1, row, 11].Style.Fill.PatternType = XLFillPatternValues.Solid;
-
-                        //            ws.Cell(row, 1, row, 11].Style.Fill.BackgroundColor.SetColor(System.Drawing.Color.DarkGray);
-
-                        //            ws.Cell(row, 1, row, 11].Style.Font.Color.SetColor(System.Drawing.Color.White);
-
-                        //        }
-
-                        //        if (rowType == "Client Total")
-                        //        {
-                        //            ws.Cell(row, 4)Value = "";
-                        //            ws.Cell(row, 6].Formula = "=SUBTOTAL(9,F" + clientStartRow + ":F" + (row - 1) + ")";
-                        //            ws.Cell(row, 7].Formula = "=SUBTOTAL(9,G" + clientStartRow + ":G" + (row - 1) + ")";
-
-                        //            ws.Cell(row, 8)Value = "";
-                        //            ws.Cell(row, 9)Value = "";
-                        //            ws.Cell(row, 10)Value = "";
-                        //            ws.Cell(row, 11)Value = "";
-                        //            ws.Cell(row, 1, row, 11].Style.Font.Bold = true;
-                        //            ws.Cell(row, 1, row, 11].Style.Font.FontSize = 12;
-
-                        //            ws.Cell(row, 1, row, 11].Style.Fill.PatternType = XLFillPatternValues.Solid;
-
-                        //            ws.Cell(row, 1, row, 11].Style.Fill.BackgroundColor.SetColor(System.Drawing.Color.LightGray);
-                        //        }
-
-                        //        if (rowType == "Client Investor Total")
-                        //        {
-                        //            ws.Cell(row, 4)Value = "";
-                        //            ws.Cell(row, 6].Formula = "=SUBTOTAL(9,F" + clientInvestorStartRow + ":F" + (row - 1) + ")";
-                        //            ws.Cell(row, 7].Formula = "=SUBTOTAL(9,G" + clientInvestorStartRow + ":G" + (row - 1) + ")";
-
-                        //            ws.Cell(row, 8)Value = "";
-                        //            ws.Cell(row, 9)Value = "";
-                        //            ws.Cell(row, 10)Value = "";
-                        //            ws.Cell(row, 11)Value = "";
-                        //            ws.Cell(row, 1, row, 11].Style.Font.Bold = true;
-                        //            ws.Cell(row, 1, row, 11].Style.Font.FontSize = 13;
-
-                        //            ws.Cell(row, 1, row, 11].Style.Fill.PatternType = XLFillPatternValues.Solid;
-
-                        //            ws.Cell(row, 1, row, 11].Style.Fill.BackgroundColor.SetColor(System.Drawing.Color.Gray);
-                        //        }
-                        //        if (rowType == "Detail")
-                        //        {
-
-
-                        //        }
-                        //        if (ws.Cell(row, 1].Text != client && rowType == "Detail")
-                        //        {
-                        //            investor = "";
-                        //            client = ws.Cell(row, 1].Text;
-                        //            clientStartRow = row;
-                        //        }
-                        //        if (ws.Cell(row, 3].Text != investor && rowType == "Detail")
-                        //        {
-                        //            investor = ws.Cell(row, 3].Text;
-                        //            clientInvestorStartRow = row;
-                        //        }
-
-                        //        dataEndRow = row;
-                        //    }
-
-                        //    ExcelRange dataRange = ws.Cell(dataStartRow - 1, 1, dataEndRow, 10];
-                        //    dataRange.AutoFilter = true;
-
-                        //    ws.Cell("A:P"].AutoFitColumns();
-                        //    ws.Column(6).Width = 20;
-                        //    ws.Column(7).Width = 20;
-
-                        //    CommonOpenFileDialog dialog = new CommonOpenFileDialog();
-                        //    dialog.InitialDirectory = "C:\\Users";
-                        //    dialog.IsFolderPicker = true;
-
-                        //    string fileName;
-
-                        //    fileName = "";
-
-                        //    if (dialog.ShowDialog() == CommonFileDialogResult.Ok)
-                        //    {
-                        //        fileName = dialog.FileName + "\\" + "SalesReport.xlsx";
-
-                        //    }
-
-
-
-                        //    //System.IO.FileInfo tableFunding = new System.IO.FileInfo(MyVariables.excelReportFilePath + "SalesReport.xlsx");
-
-                        //    System.IO.FileInfo tableFunding = new System.IO.FileInfo(fileName);
-
-
-                        //    tableFunding.Delete();
-
-                        //    pck.SaveAs(tableFunding);
-                        //    System.Diagnostics.Process.Start(fileName);
                     }
 
+                    //Client Total
+                    ws.Cell(row, 1).Value = client;
+
+                    ws.Cell(row, 6).FormulaA1 = "=SUBTOTAL(9,F" + clientStartRow + ":F" + (row - 1) + ")";
+                    ws.Cell(row, 7).FormulaA1 = "=SUBTOTAL(9,G" + clientStartRow + ":G" + (row - 1) + ")";
+                    ws.Range(row, 1, row, 11).Style.Font.Bold = true;
+                    ws.Range(row, 1, row, 11).Style.Font.FontSize = 12;
+
+                    ws.Range(row, 1, row, 11).Style.Fill.PatternType = XLFillPatternValues.Solid;
+
+                    ws.Range(row, 1, row, 11).Style.Fill.SetBackgroundColor(XLColor.LightGray);
+                    //Grand Total
+                    row++;
+                    ws.Cell(row, 1).Value = "Total";
+                    ws.Cell(row, 6).FormulaA1 = "=SUBTOTAL(9,F" + dataStartRow + ":F" + (row - 1) + ")";
+                    ws.Cell(row, 7).FormulaA1 = "=SUBTOTAL(9,G" + dataStartRow + ":G" + (row - 1) + ")";
+
+                    ws.Cell(row, 8).Value = "";
+                    ws.Range(row, 1, row, 11).Style.Font.Bold = true;
+                    ws.Range(row, 1, row, 11).Style.Font.FontSize = 14;
+
+                    ws.Range(row, 1, row, 11).Style.Fill.PatternType = XLFillPatternValues.Solid;
+
+                    ws.Range(row, 1, row, 11).Style.Fill.SetBackgroundColor(XLColor.DarkGray);
+
+                    ws.Range(row, 1, row, 11).Style.Font.SetFontColor(XLColor.White);
+
                     ws.Columns("A:P").AdjustToContents();
-                workbook.SaveAs("C:\\Users\\pdean\\SalesReport.xlsx");
-            }
+                workbook.SaveAs("C:\\Users\\pdean\\Reports\\SalesReport.xlsx");
+                }
             }
             catch (Exception ex)
             {
                 //ErrorLabel.Content = ex.Message;
                 //ErrorLabel.Foreground = new SolidColorBrush(Colors.Red);
             }
+
+            System.Diagnostics.Process.Start("C:\\Users\\pdean\\Reports\\SalesReport.xlsx");
             return Json("");
         }
 
