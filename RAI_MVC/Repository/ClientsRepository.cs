@@ -29,12 +29,12 @@ namespace RAI_MVC.Repository
             }
         }
 
-        public static void AddClient(Client client)
+        public void AddClient(Client client)
         {
             using (Context context = GetContext())
             {
                 context.Client.Add(client);
-                                
+
                 context.SaveChanges();
             }
         }

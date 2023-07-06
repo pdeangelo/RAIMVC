@@ -243,7 +243,16 @@
                     ClientPrimeRateSpread = .05
                 }
                 );
-
+            context.Role.AddOrUpdate(
+                r => r.RoleID,
+               new Role() { RoleName = "Accounting" },
+                new Role() { RoleName = "Underwriting" },
+                new Role() { RoleName = "Read Only" }
+            );
+            context.User.AddOrUpdate(
+                r => r.UserID,
+               new User() { WinUserID = "paul", UserName = "Paul", RoleID = 1, Password = "xyz" }
+            );
 
 
         }

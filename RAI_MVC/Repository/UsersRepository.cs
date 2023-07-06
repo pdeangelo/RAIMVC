@@ -32,7 +32,7 @@ namespace RAI_MVC.Repository
                    .SingleOrDefault();
             }
         }
-        public static void AddUser(User user)
+        public void AddUser(User user)
         {
             using (Context context = GetContext())
             {
@@ -49,7 +49,9 @@ namespace RAI_MVC.Repository
 
                 var loanEntity = context.Entry(user);
 
+                loanEntity.State = EntityState.Modified;
                 context.SaveChanges();
+
             }
         }
         public void DeleteUser(int userID)
@@ -86,7 +88,7 @@ namespace RAI_MVC.Repository
                    .SingleOrDefault();
             }
         }
-        public static void AddRole(Role role)
+        public void AddRole(Role role)
         {
             using (Context context = GetContext())
             {
@@ -103,6 +105,7 @@ namespace RAI_MVC.Repository
 
                 var loanEntity = context.Entry(role);
 
+                loanEntity.State = EntityState.Modified;
                 context.SaveChanges();
             }
         }

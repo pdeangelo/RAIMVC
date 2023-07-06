@@ -8489,4 +8489,16 @@ footer {
         margin: 0 0 10px 0 !important
     }
 }
+.tableFixHead {
+    overflow: auto;
+    height: 100px;
+}
+
+    .tableFixHead thead th {
+        position: sticky;
+        top: 0;
+        z-index: 1;
+        background: #fff;
+        color: black;
+    }
 /*# sourceMappingURL=site.css.map */

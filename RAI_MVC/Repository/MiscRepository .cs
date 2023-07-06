@@ -32,7 +32,7 @@ namespace RAI_MVC.Repository
                    .SingleOrDefault();
             }
         }
-        public static void AddLoanStatus(LoanStatus loanStatus)
+        public void AddLoanStatus(LoanStatus loanStatus)
         {
             using (Context context = GetContext())
             {
@@ -48,7 +48,8 @@ namespace RAI_MVC.Repository
                 context.LoanStatus.Attach(loanStatus);
 
                 var loanEntry = context.Entry(loanStatus);
-               
+
+                loanEntry.State = EntityState.Modified;
                 context.SaveChanges();
             }
         }
@@ -85,7 +86,7 @@ namespace RAI_MVC.Repository
                    .SingleOrDefault();
             }
         }
-        public static void AddDwellingType(DwellingType dwellingType)
+        public void AddDwellingType(DwellingType dwellingType)
         {
             using (Context context = GetContext())
             {
@@ -102,6 +103,7 @@ namespace RAI_MVC.Repository
 
                 var loanEntry = context.Entry(dwellingType);
 
+                loanEntry.State = EntityState.Modified;
                 context.SaveChanges();
             }
         }
@@ -138,7 +140,7 @@ namespace RAI_MVC.Repository
                    .SingleOrDefault();
             }
         }
-        public static void AddState(State state)
+        public void AddState(State state)
         {
             using (Context context = GetContext())
             {
@@ -155,6 +157,7 @@ namespace RAI_MVC.Repository
 
                 var loanEntry = context.Entry(state);
 
+                loanEntry.State = EntityState.Modified;
                 context.SaveChanges();
             }
         }
@@ -191,7 +194,7 @@ namespace RAI_MVC.Repository
                    .SingleOrDefault();
             }
         }
-        public static void AddLoanType(LoanType loanType)
+        public void AddLoanType(LoanType loanType)
         {
             using (Context context = GetContext())
             {
@@ -208,6 +211,7 @@ namespace RAI_MVC.Repository
 
                 var loanEntry = context.Entry(loanType);
 
+                loanEntry.State = EntityState.Modified;
                 context.SaveChanges();
             }
         }

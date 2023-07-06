@@ -32,7 +32,7 @@ namespace RAI_MVC.Repository
                    .SingleOrDefault();
             }
         }
-        public static void AddInvestor(Investor investor)
+        public void AddInvestor(Investor investor)
         {
             using (Context context = GetContext())
             {
@@ -47,8 +47,10 @@ namespace RAI_MVC.Repository
             {
                 context.Investor.Attach(investor);
 
-                var loanEntry = context.Entry(investor);
-               
+                var clientEntry = context.Entry(investor);
+                clientEntry.State = EntityState.Modified;
+                //comicBookEntry.Property("IssueNumber").IsModified = false;
+
                 context.SaveChanges();
             }
         }

@@ -95,13 +95,33 @@ namespace RAI_MVC.Controllers
             return View(loan);
         }
 
-        public ActionResult Index(string SearchText, string StatusSelectListItems, string EntitiesSelectListItems, string ClientsSelectListItems, string chkShowCompleted, string submitButton)
+        public ActionResult Index()
         {
            var raiLoans = _loanRepository.GetLoans();
+            
             SetupSelectListItems();
             return View(raiLoans);
         }
+        [HttpPost]
+        public ActionResult Index(string SearchText, string StatusSelectListItems, string EntitiesSelectListItems, string ClientsSelectListItems, string chkShowCompleted)
+        {
+            var raiLoans = _loanRepository.GetLoans();
 
+            //if (chkShowCompleted == "true")
+            //    raiLoans = raiLoans.Where(x => x.ClientID == Convert.ToInt32(ClientsSelectListItems)).ToList();
+
+            if (StatusSelectListItems != "")
+                raiLoans = raiLoans.Where(x => x.LoanStatusID == Convert.ToInt32(StatusSelectListItems)).ToList();
+
+            if (EntitiesSelectListItems != "")
+                raiLoans = raiLoans.Where(x => x.EntityID == Convert.ToInt32(EntitiesSelectListItems)).ToList();
+
+            if (ClientsSelectListItems != "")
+                raiLoans = raiLoans.Where(x => x.ClientID == Convert.ToInt32(ClientsSelectListItems)).ToList();
+
+            SetupSelectListItems();
+            return View(raiLoans);
+        }
         public ActionResult BaileeReport(string loanlist)
         {
             try
@@ -1202,6 +1222,105 @@ namespace RAI_MVC.Controllers
             SetupSelectListItems();
             return View(loan);
         }
+        public ActionResult AddClient()
+        {
+            var client = new Client();
+
+            SetupSelectListItems();
+            return View(client);
+        }
+        [HttpPost]
+        public ActionResult AddClient(Client client)
+        {
+            if (ModelState.IsValid)
+            {
+                _clientsRepository.AddClient(client);
+                TempData["Message"] = "Client Successfully Added";
+                return Redirect("Clients");
+            }
+            SetupSelectListItems();
+            return View(client);
+        }
+
+
+        public ActionResult AddEntity()
+        {
+            var entity = new Entity();
+
+            SetupSelectListItems();
+            return View(entity);
+        }
+        [HttpPost]
+        public ActionResult AddEntity(Entity entity)
+        {
+            if (ModelState.IsValid)
+            {
+                _entityRepository.AddEntity(entity);
+                TempData["Message"] = "Entity Successfully Added";
+                return Redirect("Entities");
+            }
+            SetupSelectListItems();
+            return View(entity);
+        }
+
+        public ActionResult AddInvestor()
+        {
+            var investor = new Investor();
+
+            SetupSelectListItems();
+            return View(investor);
+        }
+        [HttpPost]
+        public ActionResult AddInvestor(Investor investor)
+        {
+            if (ModelState.IsValid)
+            {
+                _investorRepository.AddInvestor(investor);
+                TempData["Message"] = "Investor Successfully Added";
+                return Redirect("Investors");
+            }
+            SetupSelectListItems();
+            return View(investor);
+        }
+        public ActionResult AddRole()
+        {
+            var role = new Role();
+
+            SetupSelectListItems();
+            return View(role);
+        }
+        [HttpPost]
+        public ActionResult AddRole(Role role)
+        {
+            if (ModelState.IsValid)
+            {
+                _usersRepository.AddRole(role);
+                TempData["Message"] = "Role Successfully Added";
+                return Redirect("Roles");
+            }
+            SetupSelectListItems();
+            return View(role);
+        }
+        public ActionResult AddUser()
+        {
+            var user = new User();
+
+            SetupSelectListItems();
+            return View(user);
+        }
+        [HttpPost]
+        public ActionResult AddUser(User user)
+        {
+            if (ModelState.IsValid)
+            {
+                _usersRepository.AddUser(user);
+                TempData["Message"] = "User Successfully Added";
+                return Redirect("USers");
+            }
+            SetupSelectListItems();
+            return View(user);
+        }
+
         public ActionResult Investors()
         {
             var investors = _investorRepository.GetInvestors();
@@ -2270,6 +2389,7 @@ namespace RAI_MVC.Controllers
             SetupInvestorsSelectListItems();
             SetupUsersSelectListItems();
             SetupStatusSelectListItems();
+            SetupRoleSelectListItems();
         }
         public string FormatNumberCommas(string input)
         {

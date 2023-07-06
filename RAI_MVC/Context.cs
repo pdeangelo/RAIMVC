@@ -1,4 +1,6 @@
-﻿using RAI_MVC.Models;
+﻿using Microsoft.AspNet.Identity.EntityFramework;
+using RAI_MVC.Classes;
+using RAI_MVC.Models;
 using System;
 using System.Collections.Generic;
 using System.Data.Entity;
@@ -8,9 +10,10 @@ using System.Web;
 
 namespace RAI_MVC
 {
-    public class Context : DbContext
+    public class Context : IdentityDbContext<AppUser>
     {
-        public Context() : base("RAI")
+
+        public Context() : base("RAINew")
         {
             //Database.SetInitializer(new DatabaseInitializer());
             //Database.SetInitializer<Context>(null);

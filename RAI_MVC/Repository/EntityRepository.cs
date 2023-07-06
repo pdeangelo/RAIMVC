@@ -32,7 +32,7 @@ namespace RAI_MVC.Repository
                    .SingleOrDefault();
             }
         }
-        public static void AddEntity(Entity entity)
+        public void AddEntity(Entity entity)
         {
             using (Context context = GetContext())
             {
@@ -48,7 +48,8 @@ namespace RAI_MVC.Repository
                 context.Entity.Attach(entity);
 
                 var loanEntity = context.Entry(entity);
-               
+
+                loanEntity.State = EntityState.Modified;
                 context.SaveChanges();
             }
         }
