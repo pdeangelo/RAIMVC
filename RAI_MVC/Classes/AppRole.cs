@@ -6,10 +6,10 @@ using System.Web;
 
 namespace RAI_MVC.Classes
 {
-    //public class AppRole : IdentityRole
-    //{
-    //    public AppRole() : base() { }
-    //    public AppRole(string name) : base(name) { }
-    //    // extra properties here 
-    //}
+    public class AppRole : IdentityRole
+    {
+        public AppRole() : base() { }
+        public AppRole(string name) : base(name) { }
+        // extra properties here 
+    }
 }

@@ -11,6 +11,11 @@ using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Spreadsheet;
 using ClosedXML.Excel;
+using RAI_MVC.Classes;
+using Microsoft.AspNet.Identity;
+using Microsoft.AspNet.Identity.Owin;
+using Microsoft.Owin.Security;
+using RAI_MVC.Security;
 
 namespace RAI_MVC.Controllers
 {
@@ -28,6 +33,35 @@ namespace RAI_MVC.Controllers
             _clientsRepository = new ClientsRepository();
             _investorRepository = new InvestorRepository();
             _entityRepository = new EntityRepository();
+        }
+        [Authorize]
+        public ActionResult Login()
+        {
+            var login = new Login();
+
+            return View(login);
+        }
+        [HttpPost]
+        public ActionResult Login(Login login)
+        {
+            if (ModelState.IsValid)
+            {
+                var userManager = HttpContext.GetOwinContext().GetUserManager<ApplicationUserManager>();
+                var authManager = HttpContext.GetOwinContext().Authentication;
+
+                AppUser user = userManager.Find(login.UserName, login.Password);
+                if (user != null)
+                {
+                    var ident = userManager.CreateIdentity(user,
+                        DefaultAuthenticationTypes.ApplicationCookie);
+                    //use the instance that has been created. 
+                    authManager.SignIn(
+                        new AuthenticationProperties { IsPersistent = false }, ident);
+                    return Redirect(Url.Action("RAI", "Index"));
+                }
+            }
+            ModelState.AddModelError("", "Invalid username or password");
+            return View(login);
         }
         public ActionResult Detail(int? id)
         {
@@ -151,6 +185,8 @@ namespace RAI_MVC.Controllers
                     //ErrorLabel.Content = "Please select at least one loan";
                     //ErrorLabel.Foreground = new SolidColorBrush(Colors.Red);
                     //return;
+                    TempData["Message"] = "Bailee Letter Date Missing";
+                    return RedirectToAction("Index");
                 }
 
 

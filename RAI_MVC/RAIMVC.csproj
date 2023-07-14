@@ -202,7 +202,9 @@
     <Content Include="Scripts\jquery.validate.unobtrusive.js" />
     <Content Include="Scripts\jquery.validate.unobtrusive.min.js" />
     <Content Include="Scripts\modernizr-2.6.2.js" />
-    <Content Include="Web.config" />
+    <Content Include="Web.config">
+      <SubType>Designer</SubType>
+    </Content>
     <Content Include="Views\RAI\Detail.cshtml" />
   </ItemGroup>
   <ItemGroup>
@@ -213,21 +215,12 @@
     <Compile Include="Classes\AppRole.cs" />
     <Compile Include="Classes\AppUser.cs" />
     <Compile Include="Context.cs" />
-    <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="Controllers\RAIController.cs" />
     <Compile Include="DatabaseInitializer.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="LogTable.cs" />
-    <Compile Include="Migrations\202306261528533_InitialCreate.cs" />
-    <Compile Include="Migrations\202306261528533_InitialCreate.designer.cs">
-      <DependentUpon>202306261528533_InitialCreate.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\202306291526364_TestMigration.cs" />
-    <Compile Include="Migrations\202306291526364_TestMigration.designer.cs">
-      <DependentUpon>202306291526364_TestMigration.cs</DependentUpon>
-    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountRegisterViewModel.cs" />
     <Compile Include="Models\DwellingType.cs" />
@@ -238,6 +231,7 @@
     <Compile Include="Models\Loan.cs" />
     <Compile Include="Models\LoanStatus.cs" />
     <Compile Include="Models\LoanType.cs" />
+    <Compile Include="Models\Login.cs" />
     <Compile Include="Models\Role.cs" />
     <Compile Include="Models\SalesReport.cs" />
     <Compile Include="Models\State.cs" />
@@ -296,6 +290,7 @@
     <Content Include="Views\RAI\AddRole.cshtml" />
     <Content Include="Views\RAI\AddUser.cshtml" />
     <Content Include="Views\Account\Register.cshtml" />
+    <Content Include="Views\RAI\Login.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
@@ -308,14 +303,6 @@
   </ItemGroup>
   <ItemGroup>
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Migrations\202306261528533_InitialCreate.resx">
-      <DependentUpon>202306261528533_InitialCreate.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202306291526364_TestMigration.resx">
-      <DependentUpon>202306291526364_TestMigration.cs</DependentUpon>
-    </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
